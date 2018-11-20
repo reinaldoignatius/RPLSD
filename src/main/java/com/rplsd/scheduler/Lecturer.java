@@ -23,6 +23,14 @@ public class Lecturer {
         this.availability = availability;
     }
 
+    public void setAvailability(int day, int time, boolean availability) {
+        try {
+            this.availability[day][time] = availability;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void setName(String name) {
         this.name = name;
     }
