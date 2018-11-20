@@ -107,7 +107,7 @@ public class ScheduleRule {
     for (Pair<Integer, Integer> entry: this.getRestrictedTime()) {
       restrictedTime.add(entry);
     }
-    int maxLecturerHourInADay = Math.min(this.maxLecturerHourInADay, scheduleRule.maxLecturerHourInADay);
+    int maxLecturerHourInADay = Integer.min(this.maxLecturerHourInADay, scheduleRule.maxLecturerHourInADay);
     return new ScheduleRule(nonConflictingClasses, fixedClassSchedules, restrictedTime, maxLecturerHourInADay);
   }
 

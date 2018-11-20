@@ -8,22 +8,22 @@ import static com.rplsd.scheduler.Constants.DAYS_IN_A_WEEK;
 import static com.rplsd.scheduler.Constants.HOURS_IN_A_DAY;
 
 public class Scheduler {
-  private List<ClassRoom> classRooms;
+  private List<Classroom> classrooms;
   private List<Course> courses;
   private List<Lecturer> lecturers;
   private ScheduleRule scheduleConstraint;
   private ScheduleRule schedulePreference;
 
   private ArrayList<ArrayList<List<ScheduleItem>>> schedules;
-  private HashMap<String, ArrayList<ArrayList<Boolean>>> classRoomsAvailability;
+  private HashMap<String, ArrayList<ArrayList<Boolean>>> classroomsAvailability;
   private HashMap<String, ArrayList<ArrayList<Boolean>>> lecturersAvailability;
 
-  public Scheduler(ArrayList<ClassRoom> classRooms,
+  public Scheduler(ArrayList<Classroom> classrooms,
                    ArrayList<Course> courses,
                    ArrayList<Lecturer> lecturers,
                    ScheduleRule scheduleConstraint,
                    ScheduleRule schedulePreference) {
-    this.classRooms = classRooms;
+    this.classrooms = classrooms;
     this.courses = courses;
     this.lecturers = lecturers;
     this.scheduleConstraint = scheduleConstraint;
@@ -35,16 +35,16 @@ public class Scheduler {
         schedules.get(day).add(new ArrayList<>());
       }
     }
-    classRoomsAvailability = new HashMap<>();
-    for (ClassRoom classRoom: classRooms) {
-      ArrayList<ArrayList<Boolean>> classRoomAvailability = new ArrayList<>(DAYS_IN_A_WEEK);
+    classroomsAvailability = new HashMap<>();
+    for (Classroom classroom : classrooms) {
+      ArrayList<ArrayList<Boolean>> classroomAvailability = new ArrayList<>(DAYS_IN_A_WEEK);
       for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
-        classRoomAvailability.add(new ArrayList<>(HOURS_IN_A_DAY));
+        classroomAvailability.add(new ArrayList<>(HOURS_IN_A_DAY));
         for (int time = 0; time < HOURS_IN_A_DAY; time++) {
-          classRoomAvailability.get(day).add(new Boolean(true));
+          classroomAvailability.get(day).add(true);
         }
       }
-      classRoomsAvailability.put(classRoom.getId(), classRoomAvailability);
+      classroomsAvailability.put(classroom.getId(), classroomAvailability);
     }
     lecturersAvailability = new HashMap<>();
     for (Lecturer lecturer: lecturers) {
@@ -52,35 +52,35 @@ public class Scheduler {
       for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
         lecturerAvailability.add(new ArrayList<>(HOURS_IN_A_DAY));
         for (int time = 0; time < HOURS_IN_A_DAY; time++) {
-          lecturerAvailability.get(day).add(new Boolean(lecturer.getAvailability().get(day).get(time)));
+          lecturerAvailability.get(day).add(lecturer.getAvailability().get(day).get(time));
         }
       }
       lecturersAvailability.put(lecturer.getName(), lecturerAvailability);
     }
   }
 
-  public List<ClassRoom> getClassRooms() {
-    return classRooms;
+  public List<Classroom> getClassrooms() {
+    return classrooms;
   }
 
-  public HashMap<String, ArrayList<ArrayList<Boolean>>> getClassRoomsAvailability() {
-    return classRoomsAvailability;
+  public HashMap<String, ArrayList<ArrayList<Boolean>>> getClassroomsAvailability() {
+    return classroomsAvailability;
   }
 
-  public void setClassRooms(List<ClassRoom> classRooms) {
-    this.classRooms = classRooms;
+  public void setClassrooms(List<Classroom> classrooms) {
+    this.classrooms = classrooms;
   }
 
-  public void addClassRoom(ClassRoom classRoom) {
-    classRooms.add(classRoom);
-    ArrayList<ArrayList<Boolean>> classRoomAvailability = new ArrayList<>(DAYS_IN_A_WEEK);
+  public void addClassroom(Classroom classroom) {
+    classrooms.add(classroom);
+    ArrayList<ArrayList<Boolean>> classroomAvailability = new ArrayList<>(DAYS_IN_A_WEEK);
     for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
-      classRoomAvailability.add(new ArrayList<>(HOURS_IN_A_DAY));
+      classroomAvailability.add(new ArrayList<>(HOURS_IN_A_DAY));
       for (int time = 0; time < HOURS_IN_A_DAY; time++) {
-        classRoomAvailability.get(day).add(new Boolean(true));
+        classroomAvailability.get(day).add(true);
       }
     }
-    classRoomsAvailability.put(classRoom.getId(), classRoomAvailability);
+    classroomsAvailability.put(classroom.getId(), classroomAvailability);
   }
 
   public List<Course> getCourses() {
@@ -142,14 +142,14 @@ public class Scheduler {
     return null;
   }
 
-  private List<ClassRoom> findSatisfyingClassRooms(Course course) {
-    List<ClassRoom> satisfyingClassRooms = new ArrayList<>();
-    for (ClassRoom classRoom: classRooms) {
-      if (classRoom.isSatisfying(course)) {
-        satisfyingClassRooms.add(classRoom);
+  private List<Classroom> findSatisfyingClassrooms(Course course) {
+    List<Classroom> satisfyingClassrooms = new ArrayList<>();
+    for (Classroom classroom : classrooms) {
+      if (classroom.isSatisfying(course)) {
+        satisfyingClassrooms.add(classroom);
       }
     }
-    return satisfyingClassRooms;
+    return satisfyingClassrooms;
   }
 
   private boolean checkLecturersAvailability(List<String> requiredLecturersNames, int day, int time) {
@@ -192,8 +192,8 @@ public class Scheduler {
     return true;
   }
 
-  private boolean checkConstraints(ScheduleRule rule, Course course, ClassRoom classRoom, int day, int time) {
-    if (!(classRoomsAvailability.get(classRoom.getId()).get(day).get(time))) return false;
+  private boolean checkConstraints(ScheduleRule rule, Course course, Classroom classroom, int day, int time) {
+    if (!(classroomsAvailability.get(classroom.getId()).get(day).get(time))) return false;
     if (!checkLecturersAvailability(course.getLecturers(), day, time)) return false;
     if (!checkNonConflictingConstraint(rule, course.getCourseName(), day, time)) return false;
     if (rule.getRestrictedTime().contains(new Pair<>(day, time))) return false;
@@ -206,14 +206,14 @@ public class Scheduler {
     if (currentClassRequirementIndex >= courses.size()) return true;
     Course currentCourse = courses.get(currentClassRequirementIndex);
 
-    List<ClassRoom> satisfyingClassrooms = findSatisfyingClassRooms(currentCourse);
-    for (ClassRoom satisfyingClassroom : satisfyingClassrooms) {
+    List<Classroom> satisfyingClassrooms = findSatisfyingClassrooms(currentCourse);
+    for (Classroom satisfyingClassroom : satisfyingClassrooms) {
       for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
         for (int time = 0; time < HOURS_IN_A_DAY; time++) {
           if (checkConstraints(rule, currentCourse, satisfyingClassroom, day, time)) {
             ScheduleItem scheduleItem = new ScheduleItem(currentCourse.getCourseName(), satisfyingClassroom.getId(), currentCourse.getLecturers());
             schedules.get(day).get(time).add(scheduleItem);
-            classRoomsAvailability.get(satisfyingClassroom.getId()).get(day).set(time, false);
+            classroomsAvailability.get(satisfyingClassroom.getId()).get(day).set(time, false);
             for (String lectureName : currentCourse.getLecturers()) {
               lecturersAvailability.get(lectureName).get(day).set(time, false);
             }
@@ -221,7 +221,7 @@ public class Scheduler {
             int nextClassRequirementIndex = nextHour == 0 ? currentClassRequirementIndex + 1 : currentClassRequirementIndex;
             if (schedule(rule, nextClassRequirementIndex, nextHour)) return true;
             schedules.get(day).get(time).remove(scheduleItem);
-            classRoomsAvailability.get(satisfyingClassroom.getId()).get(day).set(time, true);
+            classroomsAvailability.get(satisfyingClassroom.getId()).get(day).set(time, true);
             for (String lectureName : currentCourse.getLecturers()) {
               lecturersAvailability.get(lectureName).get(day).set(time, true);
             }
@@ -232,8 +232,19 @@ public class Scheduler {
     return false;
   }
 
+  private void sortClassroomAscendingByCapacity() {
+    class SortByCapacity implements Comparator<Classroom> {
+      // Used for sorting in ascending order of capacity
+      @Override
+      public int compare(Classroom o1, Classroom o2) {
+        return o1.getCapacity() - o2.getCapacity();
+      }
+    }
+    classrooms.sort(new SortByCapacity());
+  }
+
   public boolean schedule() {
-    // TODO: sort classroom by capacity
+    sortClassroomAscendingByCapacity(); //To prioritize class room with smaller capacity in room selection
     if (schedule(scheduleConstraint.add(schedulePreference), 0, 0)) return true;
     return schedule(scheduleConstraint, 0, 0);
   }

@@ -2,12 +2,12 @@ package com.rplsd.scheduler;
 
 import java.util.List;
 
-public class ClassRoom {
+public class Classroom {
   private String id;
   private int capacity;
   private List<String> facilities;
 
-  public ClassRoom(String id, int capacity, List<String> facilities) {
+  public Classroom(String id, int capacity, List<String> facilities) {
     this.id = id;
     this.capacity = capacity;
     this.facilities = facilities;

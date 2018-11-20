@@ -9,7 +9,7 @@ import static com.rplsd.scheduler.Constants.HOURS_IN_A_DAY;
 
 public class App {
     public static void main(String[] args) {
-        ArrayList<ClassRoom> classRooms = new ArrayList<>();
+        ArrayList<Classroom> classrooms = new ArrayList<>();
         ArrayList<Course> courses = new ArrayList<>();
         ArrayList<Lecturer> lecturers = new ArrayList<>();
 
@@ -23,7 +23,7 @@ public class App {
         ScheduleRule scheduleConstraint = new ScheduleRule(nonConflictingClassesConstraints, fixedClassSchedulesConstraints, restrictedTimeConstraints, 2);
         ScheduleRule schedulePreference = new ScheduleRule(nonConflictingClassesPreferences, fixedClassSchedulesPreferences, restrictedTimePreferences, 1);
         Scheduler scheduler = new Scheduler(
-                classRooms, courses, lecturers, scheduleConstraint, schedulePreference);
+                classrooms, courses, lecturers, scheduleConstraint, schedulePreference);
 
         scheduler.getSchedulePreference().addNonConflictingClassRule("RPLSD", "NLP");
         scheduler.getScheduleConstraint().addFixedClassSchedule("RPLSD", new HashSet<Pair<Integer, Integer>>(){{
@@ -47,24 +47,24 @@ public class App {
 
         scheduler.addLecturer(new Lecturer("ayu", availability));
 
-        scheduler.addClassRoom(new ClassRoom("7602", 100, new ArrayList<String>(){{
+        scheduler.addClassroom(new Classroom("7602", 110, new ArrayList<String>(){{
             add("ac");
             add("ac2");
         }}));
 
-        scheduler.addClassRoom(new ClassRoom("7606", 100, new ArrayList<String>(){{
+        scheduler.addClassroom(new Classroom("7606", 100, new ArrayList<String>(){{
             add("ac");
             add("ac2");
         }}));
 
-        Course course = new Course("RPLSD", 50, 100, new ArrayList<String>(){{
+        Course course = new Course("RPLSD", 50, Integer.MAX_VALUE, new ArrayList<String>(){{
             add("ac");
             add("ac2");
         }}, 2, new ArrayList<String>(){{
             add("bayu");
         }});
 
-        Course course2 = new Course("NLP", 50, 100, new ArrayList<String>(){{
+        Course course2 = new Course("NLP", 50, Integer.MAX_VALUE, new ArrayList<String>(){{
             add("ac");
             add("ac2");
         }}, 2, new ArrayList<String>(){{
@@ -82,7 +82,7 @@ public class App {
 
 
 
-//        ArrayList<ArrayList<Boolean>> classRoomAvailability = scheduler.getClassRoomsAvailability().get("7602");
+//        ArrayList<ArrayList<Boolean>> classRoomAvailability = scheduler.getClassroomsAvailability().get("7602");
 //        for (ArrayList<Boolean> day: classRoomAvailability) {
 //            for (Boolean time: day) {
 //                System.out.println(time);
