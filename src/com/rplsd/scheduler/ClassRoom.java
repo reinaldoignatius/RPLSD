@@ -6,6 +6,11 @@ public class ClassRoom {
   private int capacity;
   private List<String> facilities;
 
+  public ClassRoom(int capacity, List<String> facilities) {
+    this.capacity = capacity;
+    this.facilities = facilities;
+  }
+
   public int getCapacity() {
     return capacity;
   }
