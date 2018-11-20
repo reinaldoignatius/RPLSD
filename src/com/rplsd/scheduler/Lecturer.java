@@ -6,6 +6,11 @@ public class Lecturer {
     private String name;
     private Boolean availability[][] = new Boolean[5][11];
 
+    public Lecturer(String name, Boolean[][] availability) {
+      this.name = name;
+      this.availability = availability;
+    }
+
     public Boolean[][] getAvailability() {
         return availability;
     }
