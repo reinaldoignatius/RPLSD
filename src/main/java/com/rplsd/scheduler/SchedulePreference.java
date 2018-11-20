@@ -14,4 +14,12 @@ public class SchedulePreference {
   public void setHourPriority(int[][] hourPriority) {
     this.hourPriority = hourPriority;
   }
+
+  public void setHourPriority(int day, int time, int priority) {
+    try {
+      this.hourPriority[day][time] = priority;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 }
