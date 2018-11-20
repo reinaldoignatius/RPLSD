@@ -2,6 +2,7 @@ package com.rplsd.scheduler;
 
 import javafx.util.Pair;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -9,14 +10,14 @@ import java.util.Set;
 public class ScheduleRule {
   private Map<String, Set<String>> nonConflictingClasses;
   private Map<String, Set<Pair<Integer, Integer>>> fixedClassSchedules;
-  private Set<Pair<Integer, Integer>> restrictedHours;
+  private Set<Pair<Integer, Integer>> restrictedTime;
 
   public ScheduleRule(Map<String, Set<String>> nonConflictingClasses,
                       Map<String, Set<Pair<Integer, Integer>>> fixedClassSchedules,
-                      Set<Pair<Integer, Integer>> restrictedHours) {
+                      Set<Pair<Integer, Integer>> restrictedTime) {
     this.nonConflictingClasses = nonConflictingClasses;
     this.fixedClassSchedules = fixedClassSchedules;
-    this.restrictedHours = restrictedHours;
+    this.restrictedTime = restrictedTime;
   }
 
   public Map<String, Set<String>> getNonConflictingClasses() {
@@ -35,12 +36,12 @@ public class ScheduleRule {
     this.fixedClassSchedules = fixedClassSchedules;
   }
 
-  public Set<Pair<Integer, Integer>> getRestrictedHours() {
-    return restrictedHours;
+  public Set<Pair<Integer, Integer>> getRestrictedTime() {
+    return restrictedTime;
   }
 
-  public void setRestrictedHours(Set<Pair<Integer, Integer>> restrictedHours) {
-    this.restrictedHours = restrictedHours;
+  public void setRestrictedTime(Set<Pair<Integer, Integer>> restrictedTime) {
+    this.restrictedTime = restrictedTime;
   }
 
   public void addNonConflictingClassRule(String className, String otherClassName) {
@@ -70,8 +71,33 @@ public class ScheduleRule {
     }
   }
 
-  public void addRestrictedHour(int day, int time) {
-      restrictedHours.add(new Pair<>(day, time));
+  public void addRestrictedTime(int day, int time) {
+      restrictedTime.add(new Pair<>(day, time));
+  }
+
+  public ScheduleRule add(ScheduleRule scheduleRule) {
+    Map<String, Set<String>> nonConflictingClasses = new HashMap<>();
+    Map<String, Set<Pair<Integer, Integer>>> fixedClassSchedules = new HashMap<>();
+    Set<Pair<Integer, Integer>> restrictedTime = new HashSet<>();
+    for (Map.Entry<String, Set<String>> entry: scheduleRule.getNonConflictingClasses().entrySet()) {
+      nonConflictingClasses.put(entry.getKey(), entry.getValue());
+    }
+    for (Map.Entry<String, Set<String>> entry: this.getNonConflictingClasses().entrySet()) {
+      nonConflictingClasses.put(entry.getKey(), entry.getValue());
+    }
+    for (Map.Entry<String, Set<Pair<Integer, Integer>>> entry: scheduleRule.getFixedClassSchedules().entrySet()) {
+      fixedClassSchedules.put(entry.getKey(), entry.getValue());
+    }
+    for (Map.Entry<String, Set<Pair<Integer, Integer>>> entry: this.getFixedClassSchedules().entrySet()) {
+      fixedClassSchedules.put(entry.getKey(), entry.getValue());
+    }
+    for (Pair<Integer, Integer> entry: scheduleRule.getRestrictedTime()) {
+      restrictedTime.add(entry);
+    }
+    for (Pair<Integer, Integer> entry: this.getRestrictedTime()) {
+      restrictedTime.add(entry);
+    }
+    return new ScheduleRule(nonConflictingClasses, fixedClassSchedules, restrictedTime);
   }
 
 }

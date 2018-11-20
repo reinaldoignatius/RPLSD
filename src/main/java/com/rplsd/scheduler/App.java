@@ -13,17 +13,20 @@ public class App {
         ArrayList<Course> courses = new ArrayList<>();
         ArrayList<Lecturer> lecturers = new ArrayList<>();
 
-        Map<String, Set<String>> nonConflictingClasses = new HashMap<>();
-        Map<String, Set<Pair<Integer, Integer>>> fixedClassSchedules = new HashMap<>();
-        Set<Pair<Integer, Integer>> restrictedHours = new HashSet<>();
+        Map<String, Set<String>> nonConflictingClassesConstraints = new HashMap<>();
+        Map<String, Set<Pair<Integer, Integer>>> fixedClassSchedulesConstraints = new HashMap<>();
+        Set<Pair<Integer, Integer>> restrictedTimeConstraints = new HashSet<>();
+        Map<String, Set<String>> nonConflictingClassesPreferences = new HashMap<>();
+        Map<String, Set<Pair<Integer, Integer>>> fixedClassSchedulesPreferences = new HashMap<>();
+        Set<Pair<Integer, Integer>> restrictedTimePreferences = new HashSet<>();
 
-        ScheduleRule scheduleConstraint = new ScheduleRule(nonConflictingClasses, fixedClassSchedules, restrictedHours);
-        ScheduleRule schedulePreference = new ScheduleRule(nonConflictingClasses, fixedClassSchedules, restrictedHours);
+        ScheduleRule scheduleConstraint = new ScheduleRule(nonConflictingClassesConstraints, fixedClassSchedulesConstraints, restrictedTimeConstraints);
+        ScheduleRule schedulePreference = new ScheduleRule(nonConflictingClassesPreferences, fixedClassSchedulesPreferences, restrictedTimePreferences);
         Scheduler scheduler = new Scheduler(
                 classRooms, courses, lecturers, scheduleConstraint, schedulePreference);
 
-        scheduler.getScheduleConstraint().addNonConflictingClassRule("RPLSD", "NLP");
-        scheduler.getScheduleConstraint().addRestrictedTime(0, 1);
+        scheduler.getSchedulePreference().addNonConflictingClassRule("RPLSD", "NLP");
+        scheduler.getScheduleConstraint().addRestrictedTime(0, 0);
 
         ArrayList<ArrayList<Boolean>> availability = new ArrayList<>(DAYS_IN_A_WEEK);
         for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
@@ -35,17 +38,17 @@ public class App {
 
         availability.get(0).set(1, true);
         availability.get(0).set(2, true);
-        availability.get(0).set(3, true);
-        availability.get(0).set(4, true);
 
         scheduler.addLecturer(new Lecturer("bayu", availability));
-
-        availability.get(0).set(3, false);
-        availability.get(0).set(4, false);
 
         scheduler.addLecturer(new Lecturer("ayu", availability));
 
         scheduler.addClassRoom(new ClassRoom("7602", 100, new ArrayList<String>(){{
+            add("ac");
+            add("ac2");
+        }}));
+
+        scheduler.addClassRoom(new ClassRoom("7606", 100, new ArrayList<String>(){{
             add("ac");
             add("ac2");
         }}));
@@ -67,7 +70,7 @@ public class App {
         scheduler.addClassRequirement(course);
         scheduler.addClassRequirement(course2);
 
-        boolean possible = scheduler.schedule(scheduleConstraint, 0, 0);
+        boolean possible = scheduler.schedule();
         if (possible) scheduler.printSchedule();
 
 //        System.out.println(scheduler.findSatisfyingClassRooms(course).toString());

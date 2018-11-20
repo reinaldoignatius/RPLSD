@@ -5,6 +5,7 @@ import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.rplsd.scheduler.Constants.DAYS_IN_A_WEEK;
 import static com.rplsd.scheduler.Constants.HOURS_IN_A_DAY;
@@ -137,6 +138,13 @@ public class Scheduler {
     return schedules;
   }
 
+  public Course findCourse(String courseName) {
+    for (Course course: courses) {
+      if (course.getCourseName().equals(courseName)) return course;
+    }
+    return null;
+  }
+
   private List<ClassRoom> findSatisfyingClassRooms(Course course) {
     List<ClassRoom> satisfyingClassRooms = new ArrayList<>();
     for (ClassRoom classRoom: classRooms) {
@@ -154,43 +162,58 @@ public class Scheduler {
     return true;
   }
 
-  public boolean schedule(ScheduleRule rule, int currentClassRequirementIndex, int currentHour) {
-//    TODO: sort classroom by capacity
+  private boolean checkNonConflictingConstraint(ScheduleRule rule, String courseName, int day, int time) {
+    for (ScheduleItem scheduleItem: schedules.get(day).get(time)) {
+      if (rule.getNonConflictingClasses().containsKey(courseName)) {
+        if (rule.getNonConflictingClasses().get(courseName).contains(scheduleItem.getCourseName())) return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean schedule(ScheduleRule rule, int currentClassRequirementIndex, int currentHour) {
     if (currentClassRequirementIndex >= courses.size()) return true;
     Course currentCourse = courses.get(currentClassRequirementIndex);
     List<ClassRoom> satisfyingClassrooms = findSatisfyingClassRooms(currentCourse);
 //    List<Lecturer> satisfyingLecturers = findSatisyingLecturers(courses.get(currentClassRequirementIndex));
-    for (ClassRoom satisfyingClassroom: satisfyingClassrooms) {
+    for (ClassRoom satisfyingClassroom : satisfyingClassrooms) {
 //      for (Lecturer satisfyingLecturer: satisfyingLecturers) {
-        for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
-          for (int time = 0; time < HOURS_IN_A_DAY; time++) {
-            if (rule.getRestrictedHours().contains(new Pair<>(day, time))) {
-              List<String> requiredLecturersNames = currentCourse.getLecturers();
-              if (classRoomsAvailability.get(satisfyingClassroom.getId()).get(day).get(time) &&
-                      checkLecturersAvailability(requiredLecturersNames, day, time) &&
-                      checkNonConflictingConstraint(currentCourse.getCourseName())
-              ) {
-                ScheduleItem scheduleItem = new ScheduleItem(currentCourse.getCourseName(), satisfyingClassroom.getId(), requiredLecturersNames);
-                schedules.get(day).get(time).add(scheduleItem);
-                classRoomsAvailability.get(satisfyingClassroom.getId()).get(day).set(time, false);
-                for (String lectureName: requiredLecturersNames) {
-                  lecturersAvailability.get(lectureName).get(day).set(time, false);
-                }
-                int nextHour = currentHour < currentCourse.getHours() - 1 ? currentHour + 1 : 0;
-                int nextClassRequirementIndex = nextHour == 0 ? currentClassRequirementIndex + 1 : currentClassRequirementIndex;
-                if (schedule(rule, nextClassRequirementIndex, nextHour)) return true;
-                schedules.get(day).get(time).remove(scheduleItem);
-                classRoomsAvailability.get(satisfyingClassroom.getId()).get(day).set(time, true);
-                for (String lectureName: requiredLecturersNames) {
-                  lecturersAvailability.get(lectureName).get(day).set(time, true);
-                }
+      for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
+        for (int time = 0; time < HOURS_IN_A_DAY; time++) {
+          if (!rule.getRestrictedTime().contains(new Pair<>(day, time))) {
+            List<String> requiredLecturersNames = currentCourse.getLecturers();
+            if (classRoomsAvailability.get(satisfyingClassroom.getId()).get(day).get(time) &&
+                    checkLecturersAvailability(requiredLecturersNames, day, time) &&
+                    checkNonConflictingConstraint(rule, currentCourse.getCourseName(), day, time)
+            ) {
+              ScheduleItem scheduleItem = new ScheduleItem(currentCourse.getCourseName(), satisfyingClassroom.getId(), requiredLecturersNames);
+              schedules.get(day).get(time).add(scheduleItem);
+              classRoomsAvailability.get(satisfyingClassroom.getId()).get(day).set(time, false);
+              for (String lectureName : requiredLecturersNames) {
+                lecturersAvailability.get(lectureName).get(day).set(time, false);
+              }
+              int nextHour = currentHour < currentCourse.getHours() - 1 ? currentHour + 1 : 0;
+              int nextClassRequirementIndex = nextHour == 0 ? currentClassRequirementIndex + 1 : currentClassRequirementIndex;
+              if (schedule(rule, nextClassRequirementIndex, nextHour)) return true;
+              schedules.get(day).get(time).remove(scheduleItem);
+              classRoomsAvailability.get(satisfyingClassroom.getId()).get(day).set(time, true);
+              for (String lectureName : requiredLecturersNames) {
+                lecturersAvailability.get(lectureName).get(day).set(time, true);
               }
             }
           }
         }
+      }
 //      }
     }
     return false;
+  }
+
+  public boolean schedule() {
+    // TODO: sort classroom by capacity
+    ScheduleRule fullScheduleRule = scheduleConstraint.add(schedulePreference);
+    if (schedule(fullScheduleRule, 0, 0)) return true;
+    return schedule(scheduleConstraint, 0, 0);
   }
 
   public void printSchedule() {
