@@ -3,21 +3,23 @@ grammar Zadwal;
 package com.rplsd.scheduler;
 }
 
-array_of_words: OPEN_PARENTHESIS (WORD COMMA WHITESPACE*)* WORD CLOSE_PARENTHESIS;
-array_of_numbers: OPEN_PARENTHESIS (NUMBER COMMA WHITESPACE*)* NUMBER CLOSE_PARENTHESIS;
-fixed_schedule: FIXED SCHEDULE CLASS_ID array_of_numbers;
+array_of_lecturers: OPEN_PARENTHESIS (WORD COMMA WHITESPACE*)? WORD CLOSE_PARENTHESIS;
+array_of_facilities: OPEN_PARENTHESIS (WORD COMMA WHITESPACE*)* WORD CLOSE_PARENTHESIS;
+array_of_teaching_hours: OPEN_PARENTHESIS (NUMBER COMMA WHITESPACE*)* NUMBER CLOSE_PARENTHESIS;
+
+fixed_schedule: FIXED SCHEDULE CLASS_ID array_of_teaching_hours;
 pair_of_class_id: CLASS_ID COLON CLASS_ID;
 non_conflict: NONCONFLICT OPEN_PARENTHESIS (pair_of_class_id COMMA WHITESPACE*)* pair_of_class_id CLOSE_PARENTHESIS;
-unavailable: UNAVAILABLE array_of_numbers;
+unavailable: UNAVAILABLE array_of_teaching_hours;
 
 defineClassroom
-    : CLASSROOM WHITESPACE* ROOM_ID WHITESPACE* NUMBER WHITESPACE* array_of_words
+    : CLASSROOM WHITESPACE* ROOM_ID WHITESPACE* NUMBER WHITESPACE* array_of_facilities
     ;
 defineLecturer
-    : LECTURER WHITESPACE* WORD WHITESPACE* array_of_numbers
+    : LECTURER WHITESPACE* WORD WHITESPACE* array_of_teaching_hours
     ;
 defineClass
-    : CLASS WHITESPACE* CLASS_ID WHITESPACE* array_of_words WHITESPACE* NUMBER WHITESPACE* array_of_words WHITESPACE* NUMBER
+    : CLASS WHITESPACE* CLASS_ID WHITESPACE* array_of_lecturers WHITESPACE* NUMBER WHITESPACE* array_of_facilities WHITESPACE* NUMBER
     ;
 defineConstraint
     : CONSTRAINT (fixed_schedule | non_conflict | unavailable)
