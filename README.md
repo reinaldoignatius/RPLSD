@@ -48,6 +48,11 @@ CONSTRAINT FIXED SCHEDULE <class_id> <schedule_list>
 CONSTRAINT UNAVAILABLE <schedule_list>
 ```
 
+- Duration limit for each lecturer constraint/preference
+```$xslt
+CONSTRAINT TEACHING DURATION LIMIT <duration>
+```
+
 #### Schedule
 Run scheduler and print the result! 
 

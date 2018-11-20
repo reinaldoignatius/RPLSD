@@ -3,29 +3,39 @@ grammar Zadwal;
 package com.rplsd.scheduler;
 }
 
-array_of_lecturers: OPEN_PARENTHESIS (WORD COMMA WHITESPACE*)? WORD CLOSE_PARENTHESIS;
-array_of_facilities: OPEN_PARENTHESIS (WORD COMMA WHITESPACE*)* WORD CLOSE_PARENTHESIS;
-array_of_teaching_hours: OPEN_PARENTHESIS (NUMBER COMMA WHITESPACE*)* NUMBER CLOSE_PARENTHESIS;
-fixed_schedule: FIXED SCHEDULE CLASS_ID array_of_teaching_hours;
-pair_of_class_id: CLASS_ID COLON CLASS_ID;
+room_id: (NUMBER | WORD | ALPHANUMERIC);
+capacity: NUMBER;
+facility: WORD;
+lecturer_name: WORD;
+teaching_hour: NUMBER;
+class_id: CLASS_ID;
+attendees_count: NUMBER;
+duration: NUMBER;
+
+array_of_lecturers: OPEN_PARENTHESIS (lecturer_name COMMA WHITESPACE*)? lecturer_name CLOSE_PARENTHESIS;
+array_of_facilities: OPEN_PARENTHESIS (facility COMMA WHITESPACE*)* facility CLOSE_PARENTHESIS;
+array_of_teaching_hours: OPEN_PARENTHESIS (teaching_hour COMMA WHITESPACE*)* teaching_hour CLOSE_PARENTHESIS;
+
+fixed_schedule: FIXED SCHEDULE class_id WHITESPACE* array_of_teaching_hours;
+pair_of_class_id: class_id COLON class_id;
 non_conflict: NONCONFLICT OPEN_PARENTHESIS (pair_of_class_id COMMA WHITESPACE*)* pair_of_class_id CLOSE_PARENTHESIS;
 unavailable: UNAVAILABLE array_of_teaching_hours;
-room_id: (NUMBER | WORD | ALPHANUMERIC);
+teaching_duration_limit: TEACHING DURATION LIMIT duration;
 
 defineClassroom
-    : CLASSROOM WHITESPACE* room_id WHITESPACE* NUMBER WHITESPACE* array_of_facilities SEMICOLON
+    : CLASSROOM WHITESPACE* room_id WHITESPACE* capacity WHITESPACE* array_of_facilities SEMICOLON
     ;
 defineLecturer
-    : LECTURER WHITESPACE* WORD WHITESPACE* array_of_teaching_hours SEMICOLON
+    : LECTURER WHITESPACE* lecturer_name WHITESPACE* array_of_teaching_hours SEMICOLON
     ;
 defineClass
-    : CLASS WHITESPACE* CLASS_ID WHITESPACE* array_of_lecturers WHITESPACE* NUMBER WHITESPACE* array_of_facilities WHITESPACE* NUMBER SEMICOLON
+    : CLASS WHITESPACE* class_id WHITESPACE* array_of_lecturers WHITESPACE* attendees_count WHITESPACE* array_of_facilities WHITESPACE* duration SEMICOLON
     ;
 defineConstraint
-    : CONSTRAINT (fixed_schedule | non_conflict | unavailable) SEMICOLON
+    : CONSTRAINT (fixed_schedule | non_conflict | unavailable | teaching_duration_limit) SEMICOLON
     ;
 definePreference
-    : PREFERENCE (fixed_schedule | non_conflict | unavailable) SEMICOLON
+    : PREFERENCE (fixed_schedule | non_conflict | unavailable | teaching_duration_limit) SEMICOLON
     ;
 defineSchedule
     : SCHEDULE SEMICOLON
@@ -80,6 +90,9 @@ SCHEDULE : S C H E D U L E;
 FIXED : F I X E D;
 NONCONFLICT : N O N DASH C O N F L I C T;
 UNAVAILABLE : U N A V A I L A B L E;
+TEACHING : T E A C H I N G;
+DURATION : D U R A T I O N;
+LIMIT : L I M I T;
 NUMBER: DIGIT+;
 WORD : (LOWERCASE | UPPERCASE)+;
 CLASS_ID : ( UPPERCASE | DIGIT )+;
