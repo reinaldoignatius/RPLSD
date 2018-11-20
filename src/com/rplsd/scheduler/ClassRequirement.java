@@ -6,11 +6,13 @@ public class ClassRequirement {
   private int minimumCapacity;
   private int maximumCapacity;
   private List<String> requiredFacilities;
+  private int hours;
 
-  public ClassRequirement(int minimumCapacity, int maximumCapacity, List<String> requiredFacilities) {
+  public ClassRequirement(int minimumCapacity, int maximumCapacity, List<String> requiredFacilities, int hours) {
     this.minimumCapacity = minimumCapacity;
     this.maximumCapacity = maximumCapacity;
     this.requiredFacilities = requiredFacilities;
+    this.hours = hours;
   }
 
   public int getMinimumCapacity() {
@@ -35,5 +37,13 @@ public class ClassRequirement {
 
   public void setRequiredFacilities(List<String> requiredFacilities) {
     this.requiredFacilities = requiredFacilities;
+  }
+
+  public int getHours() {
+    return hours;
+  }
+
+  public void setHours(int hours) {
+    this.hours = hours;
   }
 }
