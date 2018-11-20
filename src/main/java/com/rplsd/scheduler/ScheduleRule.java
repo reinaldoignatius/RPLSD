@@ -61,13 +61,11 @@ public class ScheduleRule {
     }
   }
 
-  public void addFixedClassSchedule(String className, int day, int time) {
-    try {
-      fixedClassSchedules.get(className).add(new Pair<>(day, time));
-    } catch (NullPointerException e) {
-      fixedClassSchedules.put(className, new HashSet<Pair<Integer, Integer>>(){{
-        add(new Pair<>(day, time));
-      }});
+  public void addFixedClassSchedule(String className, Set<Pair<Integer, Integer>> time) {
+    if (fixedClassSchedules.containsKey(className)) {
+      fixedClassSchedules.replace(className, time);
+    } else {
+      fixedClassSchedules.put(className, time);
     }
   }
 

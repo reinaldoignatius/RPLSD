@@ -26,6 +26,10 @@ public class App {
                 classRooms, courses, lecturers, scheduleConstraint, schedulePreference);
 
         scheduler.getSchedulePreference().addNonConflictingClassRule("RPLSD", "NLP");
+        scheduler.getScheduleConstraint().addFixedClassSchedule("RPLSD", new HashSet<Pair<Integer, Integer>>(){{
+            add(new Pair<>(0, 1));
+            add(new Pair<>(0, 2));
+        }});
         scheduler.getScheduleConstraint().addRestrictedTime(0, 0);
 
         ArrayList<ArrayList<Boolean>> availability = new ArrayList<>(DAYS_IN_A_WEEK);
