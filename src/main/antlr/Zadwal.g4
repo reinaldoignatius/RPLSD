@@ -6,30 +6,34 @@ package com.rplsd.scheduler;
 array_of_lecturers: OPEN_PARENTHESIS (WORD COMMA WHITESPACE*)? WORD CLOSE_PARENTHESIS;
 array_of_facilities: OPEN_PARENTHESIS (WORD COMMA WHITESPACE*)* WORD CLOSE_PARENTHESIS;
 array_of_teaching_hours: OPEN_PARENTHESIS (NUMBER COMMA WHITESPACE*)* NUMBER CLOSE_PARENTHESIS;
-
 fixed_schedule: FIXED SCHEDULE CLASS_ID array_of_teaching_hours;
 pair_of_class_id: CLASS_ID COLON CLASS_ID;
 non_conflict: NONCONFLICT OPEN_PARENTHESIS (pair_of_class_id COMMA WHITESPACE*)* pair_of_class_id CLOSE_PARENTHESIS;
 unavailable: UNAVAILABLE array_of_teaching_hours;
+room_id: (NUMBER | WORD | ALPHANUMERIC);
 
 defineClassroom
-    : CLASSROOM WHITESPACE* ROOM_ID WHITESPACE* NUMBER WHITESPACE* array_of_facilities
+    : CLASSROOM WHITESPACE* room_id WHITESPACE* NUMBER WHITESPACE* array_of_facilities SEMICOLON
     ;
 defineLecturer
-    : LECTURER WHITESPACE* WORD WHITESPACE* array_of_teaching_hours
+    : LECTURER WHITESPACE* WORD WHITESPACE* array_of_teaching_hours SEMICOLON
     ;
 defineClass
-    : CLASS WHITESPACE* CLASS_ID WHITESPACE* array_of_lecturers WHITESPACE* NUMBER WHITESPACE* array_of_facilities WHITESPACE* NUMBER
+    : CLASS WHITESPACE* CLASS_ID WHITESPACE* array_of_lecturers WHITESPACE* NUMBER WHITESPACE* array_of_facilities WHITESPACE* NUMBER SEMICOLON
     ;
 defineConstraint
-    : CONSTRAINT (fixed_schedule | non_conflict | unavailable)
+    : CONSTRAINT (fixed_schedule | non_conflict | unavailable) SEMICOLON
     ;
 definePreference
-    : PREFERENCE (fixed_schedule | non_conflict | unavailable)
+    : PREFERENCE (fixed_schedule | non_conflict | unavailable) SEMICOLON
     ;
 defineSchedule
-    : SCHEDULE
+    : SCHEDULE SEMICOLON
     ;
+eval
+	:	((defineClassroom | defineLecturer | defineClass | defineConstraint | definePreference | defineSchedule) WHITESPACE*)* EOF
+	;
+
 
 fragment A : ('A' | 'a');
 fragment B : ('B' | 'b');
@@ -59,15 +63,14 @@ fragment Y : ('Y' | 'y');
 fragment Z : ('Z' | 'z');
 fragment DASH : '-';
 fragment DIGIT : '0'..'9';
-fragment OPEN_PARENTHESIS : '[';
-fragment CLOSE_PARENTHESIS : ']';
-fragment COMMA : ',';
-fragment COLON : ':';
 fragment LOWERCASE : [a-z];
 fragment UPPERCASE : [A-Z];
-
-WHITESPACE: ' '+;
-ANY_CHARACTER: .;
+OPEN_PARENTHESIS : '[';
+CLOSE_PARENTHESIS : ']';
+COMMA : ',';
+COLON : ':';
+WHITESPACE: (' ' | '\r' | '\n')+;
+SEMICOLON: ';';
 CLASSROOM : C L A S S R O O M;
 LECTURER : L E C T U R E R;
 CLASS : C L A S S;
@@ -79,5 +82,5 @@ NONCONFLICT : N O N DASH C O N F L I C T;
 UNAVAILABLE : U N A V A I L A B L E;
 NUMBER: DIGIT+;
 WORD : (LOWERCASE | UPPERCASE)+;
-ROOM_ID: (NUMBER | WORD | (UPPERCASE | DIGIT)+);
 CLASS_ID : ( UPPERCASE | DIGIT )+;
+ALPHANUMERIC: (LOWERCASE | UPPERCASE | DIGIT)+;
