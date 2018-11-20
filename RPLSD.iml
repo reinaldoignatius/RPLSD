@@ -8,5 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="com.tunnelvisionlabs:antlr4-annotations:4.7.1" level="project" />
+    <orderEntry type="library" name="org.antlr:antlr4:4.7.1" level="project" />
   </component>
 </module>
