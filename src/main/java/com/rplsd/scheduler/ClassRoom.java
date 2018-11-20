@@ -36,4 +36,12 @@ public class ClassRoom {
   public void setFacilities(List<String> facilities) {
     this.facilities = facilities;
   }
+
+  public boolean isSatisfying(Course course) {
+    if (capacity < course.getMinimumCapacity() || capacity > course.getMaximumCapacity()) return false;
+    for (String facility: course.getFacilities()) {
+      if (!facilities.contains(facility)) return false;
+    }
+    return true;
+  }
 }

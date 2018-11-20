@@ -2,19 +2,29 @@ package com.rplsd.scheduler;
 
 import java.util.List;
 
-public class ClassRequirement {
+public class Course {
+  private String courseName;
   private int minimumCapacity;
   private int maximumCapacity;
   private List<String> facilities;
   private int hours;
   private List<String> lecturers;
 
-  public ClassRequirement(int minimumCapacity, int maximumCapacity, List<String> facilities, int hours, List<String> lecturers) {
+  public Course(String courseName, int minimumCapacity, int maximumCapacity, List<String> facilities, int hours, List<String> lecturers) {
+    this.courseName = courseName;
     this.minimumCapacity = minimumCapacity;
     this.maximumCapacity = maximumCapacity;
     this.facilities = facilities;
     this.hours = hours;
     this.lecturers = lecturers;
+  }
+
+  public String getCourseName() {
+    return courseName;
+  }
+
+  public void setCourseName(String courseName) {
+    this.courseName = courseName;
   }
 
   public int getMinimumCapacity() {
