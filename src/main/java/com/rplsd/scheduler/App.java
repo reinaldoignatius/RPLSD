@@ -20,8 +20,8 @@ public class App {
         Map<String, Set<Pair<Integer, Integer>>> fixedClassSchedulesPreferences = new HashMap<>();
         Set<Pair<Integer, Integer>> restrictedTimePreferences = new HashSet<>();
 
-        ScheduleRule scheduleConstraint = new ScheduleRule(nonConflictingClassesConstraints, fixedClassSchedulesConstraints, restrictedTimeConstraints);
-        ScheduleRule schedulePreference = new ScheduleRule(nonConflictingClassesPreferences, fixedClassSchedulesPreferences, restrictedTimePreferences);
+        ScheduleRule scheduleConstraint = new ScheduleRule(nonConflictingClassesConstraints, fixedClassSchedulesConstraints, restrictedTimeConstraints, 2);
+        ScheduleRule schedulePreference = new ScheduleRule(nonConflictingClassesPreferences, fixedClassSchedulesPreferences, restrictedTimePreferences, 1);
         Scheduler scheduler = new Scheduler(
                 classRooms, courses, lecturers, scheduleConstraint, schedulePreference);
 

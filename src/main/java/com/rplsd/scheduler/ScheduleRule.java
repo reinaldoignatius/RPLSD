@@ -11,13 +11,17 @@ public class ScheduleRule {
   private Map<String, Set<String>> nonConflictingClasses;
   private Map<String, Set<Pair<Integer, Integer>>> fixedClassSchedules;
   private Set<Pair<Integer, Integer>> restrictedTime;
+  private int maxLecturerHourInADay;
 
   public ScheduleRule(Map<String, Set<String>> nonConflictingClasses,
                       Map<String, Set<Pair<Integer, Integer>>> fixedClassSchedules,
-                      Set<Pair<Integer, Integer>> restrictedTime) {
+                      Set<Pair<Integer, Integer>> restrictedTime,
+                      int maxLecturerHourInADay
+  ) {
     this.nonConflictingClasses = nonConflictingClasses;
     this.fixedClassSchedules = fixedClassSchedules;
     this.restrictedTime = restrictedTime;
+    this.maxLecturerHourInADay = maxLecturerHourInADay;
   }
 
   public Map<String, Set<String>> getNonConflictingClasses() {
@@ -42,6 +46,14 @@ public class ScheduleRule {
 
   public void setRestrictedTime(Set<Pair<Integer, Integer>> restrictedTime) {
     this.restrictedTime = restrictedTime;
+  }
+
+  public int getMaxLecturerHourInADay() {
+    return maxLecturerHourInADay;
+  }
+
+  public void setMaxLecturerHourInADay(int maxLecturerHourInADay) {
+    this.maxLecturerHourInADay = maxLecturerHourInADay;
   }
 
   public void addNonConflictingClassRule(String className, String otherClassName) {
@@ -95,7 +107,8 @@ public class ScheduleRule {
     for (Pair<Integer, Integer> entry: this.getRestrictedTime()) {
       restrictedTime.add(entry);
     }
-    return new ScheduleRule(nonConflictingClasses, fixedClassSchedules, restrictedTime);
+    int maxLecturerHourInADay = Math.min(this.maxLecturerHourInADay, scheduleRule.maxLecturerHourInADay);
+    return new ScheduleRule(nonConflictingClasses, fixedClassSchedules, restrictedTime, maxLecturerHourInADay);
   }
 
 }

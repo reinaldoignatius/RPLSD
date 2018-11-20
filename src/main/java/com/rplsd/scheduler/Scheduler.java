@@ -168,56 +168,73 @@ public class Scheduler {
     return true;
   }
 
+  private boolean checkFixedSchedule(ScheduleRule rule, String courseName, int day, int time) {
+    Set<Pair<Integer, Integer>> fixedClassSchedule = new HashSet<>();
+    boolean isScheduleFixed = rule.getFixedClassSchedules().containsKey(courseName);
+    if (isScheduleFixed) {
+      fixedClassSchedule = rule.getFixedClassSchedules().get(courseName);
+    }
+    return !isScheduleFixed || fixedClassSchedule.contains(new Pair<>(day, time));
+  }
+
+  private boolean checkLectureMaxHourInADay(ScheduleRule rule, List<String>lecturersName, int day) {
+    int count = 0;
+    for (List<ScheduleItem> time: schedules.get(day)){
+      for (ScheduleItem item: time) {
+        for (String lecturerName: lecturersName) {
+          if (item.getLecturerNames().contains(lecturerName)) {
+            ++count;
+            if (count >= rule.getMaxLecturerHourInADay()) return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  private boolean checkConstraints(ScheduleRule rule, Course course, ClassRoom classRoom, int day, int time) {
+    if (!(classRoomsAvailability.get(classRoom.getId()).get(day).get(time))) return false;
+    if (!checkLecturersAvailability(course.getLecturers(), day, time)) return false;
+    if (!checkNonConflictingConstraint(rule, course.getCourseName(), day, time)) return false;
+    if (rule.getRestrictedTime().contains(new Pair<>(day, time))) return false;
+    if (!checkFixedSchedule(rule, course.getCourseName(), day, time)) return false;
+    if (!checkLectureMaxHourInADay(rule, course.getLecturers(), day)) return false;
+    return true;
+  };
+
   private boolean schedule(ScheduleRule rule, int currentClassRequirementIndex, int currentHour) {
     if (currentClassRequirementIndex >= courses.size()) return true;
     Course currentCourse = courses.get(currentClassRequirementIndex);
-    Set<Pair<Integer, Integer>> fixedClassSchedule = new HashSet<>();
-    boolean fixedSchedule = false;
-    if (rule.getFixedClassSchedules().containsKey(currentCourse.getCourseName())) {
-      fixedClassSchedule = rule.getFixedClassSchedules().get(currentCourse.getCourseName());
-      fixedSchedule = true;
-    }
+
     List<ClassRoom> satisfyingClassrooms = findSatisfyingClassRooms(currentCourse);
-//    List<Lecturer> satisfyingLecturers = findSatisyingLecturers(courses.get(currentClassRequirementIndex));
     for (ClassRoom satisfyingClassroom : satisfyingClassrooms) {
-//      for (Lecturer satisfyingLecturer: satisfyingLecturers) {
       for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
         for (int time = 0; time < HOURS_IN_A_DAY; time++) {
-          if (!fixedSchedule || fixedClassSchedule.contains(new Pair<>(day, time))) {
-            if (!rule.getRestrictedTime().contains(new Pair<>(day, time))) {
-              List<String> requiredLecturersNames = currentCourse.getLecturers();
-              if (classRoomsAvailability.get(satisfyingClassroom.getId()).get(day).get(time) &&
-                      checkLecturersAvailability(requiredLecturersNames, day, time) &&
-                      checkNonConflictingConstraint(rule, currentCourse.getCourseName(), day, time)
-              ) {
-                ScheduleItem scheduleItem = new ScheduleItem(currentCourse.getCourseName(), satisfyingClassroom.getId(), requiredLecturersNames);
-                schedules.get(day).get(time).add(scheduleItem);
-                classRoomsAvailability.get(satisfyingClassroom.getId()).get(day).set(time, false);
-                for (String lectureName : requiredLecturersNames) {
-                  lecturersAvailability.get(lectureName).get(day).set(time, false);
-                }
-                int nextHour = currentHour < currentCourse.getHours() - 1 ? currentHour + 1 : 0;
-                int nextClassRequirementIndex = nextHour == 0 ? currentClassRequirementIndex + 1 : currentClassRequirementIndex;
-                if (schedule(rule, nextClassRequirementIndex, nextHour)) return true;
-                schedules.get(day).get(time).remove(scheduleItem);
-                classRoomsAvailability.get(satisfyingClassroom.getId()).get(day).set(time, true);
-                for (String lectureName : requiredLecturersNames) {
-                  lecturersAvailability.get(lectureName).get(day).set(time, true);
-                }
-              }
+          if (checkConstraints(rule, currentCourse, satisfyingClassroom, day, time)) {
+            ScheduleItem scheduleItem = new ScheduleItem(currentCourse.getCourseName(), satisfyingClassroom.getId(), currentCourse.getLecturers());
+            schedules.get(day).get(time).add(scheduleItem);
+            classRoomsAvailability.get(satisfyingClassroom.getId()).get(day).set(time, false);
+            for (String lectureName : currentCourse.getLecturers()) {
+              lecturersAvailability.get(lectureName).get(day).set(time, false);
+            }
+            int nextHour = currentHour < currentCourse.getHours() - 1 ? currentHour + 1 : 0;
+            int nextClassRequirementIndex = nextHour == 0 ? currentClassRequirementIndex + 1 : currentClassRequirementIndex;
+            if (schedule(rule, nextClassRequirementIndex, nextHour)) return true;
+            schedules.get(day).get(time).remove(scheduleItem);
+            classRoomsAvailability.get(satisfyingClassroom.getId()).get(day).set(time, true);
+            for (String lectureName : currentCourse.getLecturers()) {
+              lecturersAvailability.get(lectureName).get(day).set(time, true);
             }
           }
         }
       }
-//      }
     }
     return false;
   }
 
   public boolean schedule() {
     // TODO: sort classroom by capacity
-    ScheduleRule fullScheduleRule = scheduleConstraint.add(schedulePreference);
-    if (schedule(fullScheduleRule, 0, 0)) return true;
+    if (schedule(scheduleConstraint.add(schedulePreference), 0, 0)) return true;
     return schedule(scheduleConstraint, 0, 0);
   }
 
