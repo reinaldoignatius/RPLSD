@@ -5,6 +5,9 @@ import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.rplsd.scheduler.Constants.DAYS_IN_A_WEEK;
+import static com.rplsd.scheduler.Constants.HOURS_IN_A_DAY;
+
 public class Scheduler {
   private List<ClassRoom> classrooms;
   private List<ClassRequirement> classRequirements;
@@ -14,9 +17,9 @@ public class Scheduler {
   private ArrayList<ArrayList<List<Pair<ClassRoom, Lecturer>>>> schedules;
 
   public Scheduler() {
-    schedules = new ArrayList<>(5);
+    schedules = new ArrayList<>(DAYS_IN_A_WEEK);
     for (ArrayList<List<Pair<ClassRoom, Lecturer>>> day: schedules) {
-      day = new ArrayList<>(11);
+      day = new ArrayList<>(HOURS_IN_A_DAY);
       for (List<Pair<ClassRoom, Lecturer>> time: day) {
         time = new ArrayList<>();
       }
