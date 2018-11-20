@@ -1,5 +1,8 @@
 package com.rplsd.scheduler;
 
+import javafx.util.Pair;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Scheduler {
@@ -8,13 +11,16 @@ public class Scheduler {
   private List<Lecturer> lecturers;
   private ScheduleConstraint scheduleConstraint;
   private SchedulePreference schedulePreference;
+  private ArrayList<ArrayList<List<Pair<ClassRoom, Lecturer>>>> schedules;
 
-  public Scheduler(List<ClassRoom> classrooms, List<ClassRequirement> classRequirements, List<Lecturer> lecturers, ScheduleConstraint scheduleConstraint, SchedulePreference schedulePreference) {
-    this.classrooms = classrooms;
-    this.classRequirements = classRequirements;
-    this.lecturers = lecturers;
-    this.scheduleConstraint = scheduleConstraint;
-    this.schedulePreference = schedulePreference;
+  public Scheduler() {
+    schedules = new ArrayList<>(5);
+    for (ArrayList<List<Pair<ClassRoom, Lecturer>>> day: schedules) {
+      day = new ArrayList<>(11);
+      for (List<Pair<ClassRoom, Lecturer>> time: day) {
+        time = new ArrayList<>();
+      }
+    }
   }
 
   public List<ClassRoom> getClassrooms() {
@@ -55,5 +61,9 @@ public class Scheduler {
 
   public void setSchedulePreference(SchedulePreference schedulePreference) {
     this.schedulePreference = schedulePreference;
+  }
+
+  public ArrayList<ArrayList<List<Pair<ClassRoom, Lecturer>>>> getSchedules() {
+    return schedules;
   }
 }
