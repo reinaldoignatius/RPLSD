@@ -3,12 +3,22 @@ package com.rplsd.scheduler;
 import java.util.List;
 
 public class ClassRoom {
+  private String id;
   private int capacity;
   private List<String> facilities;
 
-  public ClassRoom(int capacity, List<String> facilities) {
+  public ClassRoom(String id, int capacity, List<String> facilities) {
+    this.id = id;
     this.capacity = capacity;
     this.facilities = facilities;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
   }
 
   public int getCapacity() {
