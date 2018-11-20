@@ -3,11 +3,30 @@ grammar Zadwal;
 package com.rplsd.scheduler;
 }
 
+array_of_words: OPEN_PARENTHESIS (WORD COMMA WHITESPACE*)* WORD CLOSE_PARENTHESIS;
+array_of_numbers: OPEN_PARENTHESIS (NUMBER COMMA WHITESPACE*)* NUMBER CLOSE_PARENTHESIS;
+fixed_schedule: FIXED SCHEDULE CLASS_ID array_of_numbers;
+pair_of_class_id: CLASS_ID COLON CLASS_ID;
+non_conflict: NONCONFLICT OPEN_PARENTHESIS (pair_of_class_id COMMA WHITESPACE*)* pair_of_class_id CLOSE_PARENTHESIS;
+unavailable: UNAVAILABLE array_of_numbers;
+
 defineClassroom
-    : CLASSROOM WHITESPACE? (ROOM|NUMBER) WHITESPACE? NUMBER
+    : CLASSROOM WHITESPACE* ROOM_ID WHITESPACE* NUMBER WHITESPACE* array_of_words
     ;
 defineLecturer
-    : LECTURER WORD
+    : LECTURER WHITESPACE* WORD WHITESPACE* array_of_numbers
+    ;
+defineClass
+    : CLASS WHITESPACE* CLASS_ID WHITESPACE* array_of_words WHITESPACE* NUMBER WHITESPACE* array_of_words WHITESPACE* NUMBER
+    ;
+defineConstraint
+    : CONSTRAINT (fixed_schedule | non_conflict | unavailable)
+    ;
+definePreference
+    : PREFERENCE (fixed_schedule | non_conflict | unavailable)
+    ;
+defineSchedule
+    : SCHEDULE
     ;
 
 fragment A : ('A' | 'a');
@@ -41,6 +60,7 @@ fragment DIGIT : '0'..'9';
 fragment OPEN_PARENTHESIS : '[';
 fragment CLOSE_PARENTHESIS : ']';
 fragment COMMA : ',';
+fragment COLON : ':';
 fragment LOWERCASE : [a-z];
 fragment UPPERCASE : [A-Z];
 
@@ -55,11 +75,7 @@ SCHEDULE : S C H E D U L E;
 FIXED : F I X E D;
 NONCONFLICT : N O N DASH C O N F L I C T;
 UNAVAILABLE : U N A V A I L A B L E;
-MAX : M A X;
-PARALLEL : P A R A L L E L;
 NUMBER: DIGIT+;
 WORD : (LOWERCASE | UPPERCASE)+;
-ROOM: (UPPERCASE | DIGIT)+;
+ROOM_ID: (NUMBER | WORD | (UPPERCASE | DIGIT)+);
 CLASS_ID : ( UPPERCASE | DIGIT )+;
-
-
