@@ -68,7 +68,7 @@ public class ZadwalWalker extends ZadwalBaseListener {
         System.out.println("Schedule!");
         if (ZadwalContext.getInstance().getScheduler().schedule()) {
             ZadwalContext.getInstance().getScheduler().printSchedule();
-//            System.out.println(ZadwalContext.getInstance().getScheduler());
+            System.out.println(ZadwalContext.getInstance().getScheduler());
 
         } else {
             System.out.println("No schedule can satisfy all constraint");

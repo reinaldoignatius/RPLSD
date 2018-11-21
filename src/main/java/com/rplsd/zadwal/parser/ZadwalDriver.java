@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
@@ -13,10 +14,16 @@ public class ZadwalDriver {
         ZadwalLexer lexer = new ZadwalLexer(charStream);
         CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
         ZadwalParser parser = new ZadwalParser(commonTokenStream);
-        ParseTree tree = parser.eval(); // parse the content and get the tree
-        ZadwalWalker listener = new ZadwalWalker();
-
-        ParseTreeWalker walker = new ParseTreeWalker();
-        walker.walk(listener, tree);
+        parser.addErrorListener(ParserErrorListener.INSTANCE);
+        try {
+            ParseTree tree = parser.eval(); // parse the content and get the tree
+            ZadwalWalker listener = new ZadwalWalker();
+            ParseTreeWalker walker = new ParseTreeWalker();
+            walker.walk(listener, tree);
+        } catch (ParseCancellationException e) {
+            //do nothing
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

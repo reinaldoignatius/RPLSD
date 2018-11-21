@@ -61,4 +61,22 @@ run {
     standardInput = System.in;
 }
 
-mainClassName = "com.rplsd.zadwal.App"
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.rplsd.zadwal.Zadwal'
+    }
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',
+                'Implementation-Version': version,
+                'Main-Class': 'com.rplsd.zadwal.Zadwal'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+
+mainClassName = "com.rplsd.zadwal.Zadwal"
