@@ -1,9 +1,6 @@
 package com.rplsd.zadwal.parser;
 
-import com.rplsd.zadwal.scheduler.Classroom;
-import com.rplsd.zadwal.scheduler.Lecturer;
-import com.rplsd.zadwal.scheduler.Scheduler;
-import com.rplsd.zadwal.scheduler.SchedulerContext;
+import com.rplsd.zadwal.scheduler.*;
 
 import java.util.ArrayList;
 
@@ -17,9 +14,9 @@ public class ZadwalWalker extends ZadwalBaseListener {
     private int attendeesCount;
     private int duration;
     private int maxCapacity;
-    private ArrayList<String> lecturers;
-    private ArrayList<String> facilities;
-    private ArrayList<String> teachingHours;
+    private ArrayList<String> lecturers = new ArrayList<>();
+    private ArrayList<String> facilities = new ArrayList<>();
+    private ArrayList<String> teachingHours = new ArrayList<>();
 
     @Override public void exitDefineClassroom(ZadwalParser.DefineClassroomContext ctx) {
         System.out.println(String.format("Define Classroom: %s %s %s", roomId, capacity, facilities));
@@ -37,7 +34,18 @@ public class ZadwalWalker extends ZadwalBaseListener {
         SchedulerContext.getInstance().getScheduler().addLecturer(lecturer);
     }
     @Override public void enterDefineClass(ZadwalParser.DefineClassContext ctx) {
-        System.out.println("define class rule entered: " + ctx.getText());
+        maxCapacity = Constants.MAX_INT;
+    }
+
+    @Override public void exitDefineClass(ZadwalParser.DefineClassContext ctx) {
+        System.out.println(String.format(
+                "Define Class: %s %s %s %s %s %s",
+                classId, attendeesCount, maxCapacity, facilities, duration, lecturers
+        ));
+        Course course = new Course(
+                classId, attendeesCount, maxCapacity, facilities, duration, lecturers
+        );
+        SchedulerContext.getInstance().getScheduler().addClassRequirement(course);
     }
     @Override public void enterDefineConstraint(ZadwalParser.DefineConstraintContext ctx) {
         System.out.println("define constraint rule entered: " + ctx.getText());
@@ -71,6 +79,23 @@ public class ZadwalWalker extends ZadwalBaseListener {
 
     @Override public void enterLecturer_name(ZadwalParser.Lecturer_nameContext ctx) {
         lecturerName = ctx.getText();
+        lecturers.add(lecturerName);
+    }
+    @Override public void enterClass_id(ZadwalParser.Class_idContext ctx) {
+        classId = ctx.getText();
+    }
+    @Override public void enterAttendees_count(ZadwalParser.Attendees_countContext ctx) {
+        attendeesCount = Integer.parseInt(ctx.getText());
+    }
+    @Override public void enterMax_capacity(ZadwalParser.Max_capacityContext ctx) {
+        maxCapacity = Integer.parseInt(ctx.getText());
+    }
+    @Override public void enterDuration(ZadwalParser.DurationContext ctx) {
+        duration = Integer.parseInt(ctx.getText());
+    }
+
+    @Override public void enterArray_of_lecturers(ZadwalParser.Array_of_lecturersContext ctx) {
+        lecturers = new ArrayList<>();
     }
 
 
