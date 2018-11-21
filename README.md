@@ -56,3 +56,14 @@ CONSTRAINT TEACHING DURATION LIMIT <duration>
 #### Schedule
 Run scheduler and print the result! 
 
+## Development
+
+Build:
+```$xslt
+./gradlew build
+```
+
+Run:
+```$xslt
+./gradlew run
+```
