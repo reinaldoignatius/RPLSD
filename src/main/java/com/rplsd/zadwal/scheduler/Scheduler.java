@@ -16,7 +16,7 @@ public class Scheduler {
 
   private ArrayList<ArrayList<List<ScheduleItem>>> schedules;
   private HashMap<String, ArrayList<ArrayList<Boolean>>> classroomsAvailability;
-  private HashMap<String, ArrayList<ArrayList<Boolean>>> lecturersAvailability;
+  private HashMap<String, List<Pair<Integer, Integer>>> lecturersAvailability;
 
   public Scheduler(ArrayList<Classroom> classrooms,
                    ArrayList<Course> courses,
@@ -48,14 +48,7 @@ public class Scheduler {
     }
     lecturersAvailability = new HashMap<>();
     for (Lecturer lecturer: lecturers) {
-      ArrayList<ArrayList<Boolean>> lecturerAvailability = new ArrayList<>();
-      for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
-        lecturerAvailability.add(new ArrayList<>(HOURS_IN_A_DAY));
-        for (int time = 0; time < HOURS_IN_A_DAY; time++) {
-          lecturerAvailability.get(day).add(lecturer.getAvailability().get(day).get(time));
-        }
-      }
-      lecturersAvailability.put(lecturer.getName(), lecturerAvailability);
+      lecturersAvailability.put(lecturer.getName(), lecturer.getAvailability());
     }
   }
 
@@ -105,14 +98,7 @@ public class Scheduler {
 
   public void addLecturer(Lecturer lecturer) {
     this.lecturers.add(lecturer);
-    ArrayList<ArrayList<Boolean>> lecturerAvailability = new ArrayList<>();
-    for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
-      lecturerAvailability.add(new ArrayList<>(HOURS_IN_A_DAY));
-      for (int time = 0; time < HOURS_IN_A_DAY; time++) {
-        lecturerAvailability.get(day).add(new Boolean(lecturer.getAvailability().get(day).get(time)));
-      }
-    }
-    lecturersAvailability.put(lecturer.getName(), lecturerAvailability);
+    lecturersAvailability.put(lecturer.getName(), lecturer.getAvailability());
   }
 
   public ScheduleRule getScheduleConstraint() {
@@ -152,12 +138,12 @@ public class Scheduler {
     return satisfyingClassrooms;
   }
 
-  private boolean checkLecturersAvailability(List<String> requiredLecturersNames, int day, int time) {
-    for (String requiredLecturerName: requiredLecturersNames) {
-      if (!lecturersAvailability.get(requiredLecturerName).get(day).get(time)) return false;
-    }
-    return true;
-  }
+//  private boolean checkLecturersAvailability(List<String> requiredLecturersNames, int day, int time) {
+//    for (String requiredLecturerName: requiredLecturersNames) {
+//      if (!lecturersAvailability.get(requiredLecturerName).get(day).get(time)) return false;
+//    }
+//    return true;
+//  }
 
   private boolean checkNonConflictingConstraint(ScheduleRule rule, String courseName, int day, int time) {
     for (ScheduleItem scheduleItem: schedules.get(day).get(time)) {
@@ -194,7 +180,7 @@ public class Scheduler {
 
   private boolean checkConstraints(ScheduleRule rule, Course course, Classroom classroom, int day, int time) {
     if (!(classroomsAvailability.get(classroom.getId()).get(day).get(time))) return false;
-    if (!checkLecturersAvailability(course.getLecturers(), day, time)) return false;
+//    if (!checkLecturersAvailability(course.getLecturers(), day, time)) return false;
     if (!checkNonConflictingConstraint(rule, course.getCourseName(), day, time)) return false;
     if (rule.getRestrictedTime().contains(new Pair<>(day, time))) return false;
     if (!checkFixedSchedule(rule, course.getCourseName(), day, time)) return false;
@@ -206,26 +192,41 @@ public class Scheduler {
     if (currentClassRequirementIndex >= courses.size()) return true;
     Course currentCourse = courses.get(currentClassRequirementIndex);
 
+    List<Pair<Integer, Integer>> requiredLecturersAvailability = new ArrayList<>();
+    for (String requiredLecturerName: currentCourse.getLecturers()) {
+      for (Pair<Integer, Integer> availableTime: lecturersAvailability.get(requiredLecturerName)) {
+        requiredLecturersAvailability.add(availableTime);
+        for (String otherRequiredLecturerName: currentCourse.getLecturers()) {
+          if (!requiredLecturerName.equals(otherRequiredLecturerName)) {
+            if (!lecturersAvailability.get(otherRequiredLecturerName).contains(availableTime)) {
+              requiredLecturersAvailability.remove(availableTime);
+              break;
+            }
+          }
+        }
+      }
+    }
     List<Classroom> satisfyingClassrooms = findSatisfyingClassrooms(currentCourse);
     for (Classroom satisfyingClassroom : satisfyingClassrooms) {
-      for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
-        for (int time = 0; time < HOURS_IN_A_DAY; time++) {
-          if (checkConstraints(rule, currentCourse, satisfyingClassroom, day, time)) {
+      for (Pair<Integer, Integer> availableTime: requiredLecturersAvailability) {
+//      for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
+//        for (int time = 0; time < HOURS_IN_A_DAY; time++) {
+          if (checkConstraints(rule, currentCourse, satisfyingClassroom, availableTime.getKey(), availableTime.getValue())) {
             ScheduleItem scheduleItem = new ScheduleItem(currentCourse.getCourseName(), satisfyingClassroom.getId(), currentCourse.getLecturers());
-            schedules.get(day).get(time).add(scheduleItem);
-            classroomsAvailability.get(satisfyingClassroom.getId()).get(day).set(time, false);
+            schedules.get(availableTime.getKey()).get(availableTime.getValue()).add(scheduleItem);
+            classroomsAvailability.get(satisfyingClassroom.getId()).get(availableTime.getKey()).set(availableTime.getValue(), false);
             for (String lectureName : currentCourse.getLecturers()) {
-              lecturersAvailability.get(lectureName).get(day).set(time, false);
+              lecturersAvailability.get(lectureName).remove(availableTime);
             }
             int nextHour = currentHour < currentCourse.getHours() - 1 ? currentHour + 1 : 0;
             int nextClassRequirementIndex = nextHour == 0 ? currentClassRequirementIndex + 1 : currentClassRequirementIndex;
             if (schedule(rule, nextClassRequirementIndex, nextHour)) return true;
-            schedules.get(day).get(time).remove(scheduleItem);
-            classroomsAvailability.get(satisfyingClassroom.getId()).get(day).set(time, true);
+            schedules.get(availableTime.getKey()).get(availableTime.getValue()).remove(scheduleItem);
+            classroomsAvailability.get(satisfyingClassroom.getId()).get(availableTime.getKey()).set(availableTime.getValue(), true);
             for (String lectureName : currentCourse.getLecturers()) {
-              lecturersAvailability.get(lectureName).get(day).set(time, true);
+              lecturersAvailability.get(lectureName).add(availableTime);
             }
-          }
+//          }
         }
       }
     }
