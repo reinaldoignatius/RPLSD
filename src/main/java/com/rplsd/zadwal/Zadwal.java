@@ -1,9 +1,13 @@
 package com.rplsd.zadwal;
 import com.rplsd.zadwal.parser.ZadwalDriver;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
+
+
 
 public class Zadwal
 {
@@ -22,6 +26,15 @@ public class Zadwal
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+        } else if(args.length == 1) {
+            try {
+                byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
+                driver.start(new String(encoded, "UTF-8"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
 
         }
     }
