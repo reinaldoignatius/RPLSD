@@ -1,11 +1,11 @@
-package com.rplsd.scheduler;
+package com.rplsd.zadwal.scheduler;
 
 import javafx.util.Pair;
 
 import java.util.*;
 
-import static com.rplsd.scheduler.Constants.DAYS_IN_A_WEEK;
-import static com.rplsd.scheduler.Constants.HOURS_IN_A_DAY;
+import static com.rplsd.zadwal.scheduler.Constants.DAYS_IN_A_WEEK;
+import static com.rplsd.zadwal.scheduler.Constants.HOURS_IN_A_DAY;
 
 public class Scheduler {
   private List<Classroom> classrooms;

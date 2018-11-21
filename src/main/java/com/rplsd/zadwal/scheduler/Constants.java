@@ -1,4 +1,4 @@
-package com.rplsd.scheduler;
+package com.rplsd.zadwal.scheduler;
 
 public class Constants {
   public static int DAYS_IN_A_WEEK = 5;

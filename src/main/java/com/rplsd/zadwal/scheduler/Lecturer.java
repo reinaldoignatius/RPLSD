@@ -1,4 +1,4 @@
-package com.rplsd.scheduler;
+package com.rplsd.zadwal.scheduler;
 
 import java.util.ArrayList;
 

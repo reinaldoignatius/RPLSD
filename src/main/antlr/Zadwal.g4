@@ -1,6 +1,6 @@
 grammar Zadwal;
 @header {
-package com.rplsd.scheduler;
+package com.rplsd.zadwal.parser;
 }
 
 room_id: (NUMBER | WORD | ALPHANUMERIC);
@@ -12,7 +12,7 @@ teaching_hour: NUMBER;
 attendees_count: NUMBER;
 duration: NUMBER;
 
-array_of_lecturers: OPEN_PARENTHESIS (lecturer_name COMMA WHITESPACE*)? lecturer_name CLOSE_PARENTHESIS;
+array_of_lecturers: (OPEN_PARENTHESIS (lecturer_name COMMA WHITESPACE*)? lecturer_name CLOSE_PARENTHESIS | lecturer_name);
 array_of_facilities: OPEN_PARENTHESIS (facility COMMA WHITESPACE*)* facility CLOSE_PARENTHESIS;
 array_of_teaching_hours: OPEN_PARENTHESIS (teaching_hour COMMA WHITESPACE*)* teaching_hour CLOSE_PARENTHESIS;
 
@@ -21,6 +21,7 @@ pair_of_class_id: class_id COLON class_id;
 non_conflict: NONCONFLICT OPEN_PARENTHESIS (pair_of_class_id COMMA WHITESPACE*)* pair_of_class_id CLOSE_PARENTHESIS;
 unavailable: UNAVAILABLE array_of_teaching_hours;
 teaching_duration_limit: TEACHING DURATION LIMIT duration;
+max_capacity: NUMBER;
 
 defineClassroom
     : CLASSROOM WHITESPACE* room_id WHITESPACE* capacity WHITESPACE* array_of_facilities SEMICOLON
@@ -29,7 +30,7 @@ defineLecturer
     : LECTURER WHITESPACE* lecturer_name WHITESPACE* array_of_teaching_hours SEMICOLON
     ;
 defineClass
-    : CLASS WHITESPACE* class_id WHITESPACE* array_of_lecturers WHITESPACE* attendees_count WHITESPACE* array_of_facilities WHITESPACE* duration SEMICOLON
+    : CLASS WHITESPACE* class_id WHITESPACE* array_of_lecturers WHITESPACE* attendees_count  WHITESPACE* max_capacity? WHITESPACE* array_of_facilities WHITESPACE* duration SEMICOLON
     ;
 defineConstraint
     : CONSTRAINT (fixed_schedule | non_conflict | unavailable | teaching_duration_limit) SEMICOLON
@@ -75,11 +76,11 @@ fragment DASH : '-';
 fragment DIGIT : '0'..'9';
 fragment LOWERCASE : [a-z];
 fragment UPPERCASE : [A-Z];
-OPEN_PARENTHESIS : '[';
+OPEN_PARENTHESIS : '[' ;
 CLOSE_PARENTHESIS : ']';
 COMMA : ',';
 COLON : ':';
-WHITESPACE: (' ' | '\r' | '\n')+;
+WHITESPACE: (' ' | '\r' | '\n')+ -> skip;
 SEMICOLON: ';';
 CLASSROOM : C L A S S R O O M;
 LECTURER : L E C T U R E R;
@@ -93,3 +94,6 @@ UNAVAILABLE : U N A V A I L A B L E;
 NUMBER: DIGIT+;
 WORD : (LOWERCASE | UPPERCASE)+;
 ALPHANUMERIC: (LOWERCASE | UPPERCASE | DIGIT)+;
+TEACHING : T E A C H I N G;
+DURATION: D U R A T I O N;
+LIMIT: L I M I T;
