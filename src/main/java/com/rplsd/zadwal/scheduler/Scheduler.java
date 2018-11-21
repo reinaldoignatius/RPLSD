@@ -1,5 +1,6 @@
 package com.rplsd.zadwal.scheduler;
 
+import com.google.gson.Gson;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -259,5 +260,9 @@ public class Scheduler {
         System.out.println("]");
       }
     }
+  }
+  @Override
+  public String toString() {
+    return new Gson().toJson(this);
   }
 }
