@@ -18,10 +18,10 @@ public class Zadwal
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             try {
                 String line;
-                System.out.print(">");
+                System.out.print("> ");
                 while((line = br.readLine()) != null) {
                     if(line != "\n") driver.start(line);
-                    System.out.print(">");
+                    System.out.print("> ");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
