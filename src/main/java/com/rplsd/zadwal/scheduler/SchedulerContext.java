@@ -25,4 +25,21 @@ public class SchedulerContext {
         return scheduler;
     }
 
+    public static ArrayList< ArrayList<Boolean> > availabilityParser(ArrayList<String> teachingHours) {
+        ArrayList<ArrayList<Boolean>> res = new ArrayList<>();
+        for(int i=0;i<Constants.DAYS_IN_A_WEEK;i++) {
+            ArrayList<Boolean> buff = new ArrayList<Boolean>(Constants.HOURS_IN_A_DAY);
+            for(int j=0; j<Constants.HOURS_IN_A_DAY; j++) {
+                buff.add(false);
+            }
+            res.add(buff);
+        }
+        for(String i : teachingHours) {
+            int day = Integer.parseInt(i.substring(0,1))-1;
+            int hour = Integer.parseInt(i.substring(1))-1;
+            res.get(day).set(hour, true);
+        }
+        return res;
+    }
+
 }

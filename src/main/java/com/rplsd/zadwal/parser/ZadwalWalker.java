@@ -1,6 +1,8 @@
 package com.rplsd.zadwal.parser;
 
 import com.rplsd.zadwal.scheduler.Classroom;
+import com.rplsd.zadwal.scheduler.Lecturer;
+import com.rplsd.zadwal.scheduler.Scheduler;
 import com.rplsd.zadwal.scheduler.SchedulerContext;
 
 import java.util.ArrayList;
@@ -29,6 +31,10 @@ public class ZadwalWalker extends ZadwalBaseListener {
     }
     @Override public void exitDefineLecturer(ZadwalParser.DefineLecturerContext ctx) {
         System.out.println(String.format("Define Lecturer: %s %s", lecturerName, teachingHours));
+        Lecturer lecturer = new Lecturer(
+                lecturerName, SchedulerContext.availabilityParser(teachingHours)
+        );
+        SchedulerContext.getInstance().getScheduler().addLecturer(lecturer);
     }
     @Override public void enterDefineClass(ZadwalParser.DefineClassContext ctx) {
         System.out.println("define class rule entered: " + ctx.getText());
