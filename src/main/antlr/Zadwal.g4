@@ -4,11 +4,11 @@ package com.rplsd.scheduler;
 }
 
 room_id: (NUMBER | WORD | ALPHANUMERIC);
+class_id: ALPHANUMERIC;
 capacity: NUMBER;
 facility: WORD;
 lecturer_name: WORD;
 teaching_hour: NUMBER;
-class_id: CLASS_ID;
 attendees_count: NUMBER;
 duration: NUMBER;
 
@@ -37,11 +37,11 @@ defineConstraint
 definePreference
     : PREFERENCE (fixed_schedule | non_conflict | unavailable | teaching_duration_limit) SEMICOLON
     ;
-defineSchedule
+startSchedule
     : SCHEDULE SEMICOLON
     ;
 eval
-	:	((defineClassroom | defineLecturer | defineClass | defineConstraint | definePreference | defineSchedule) WHITESPACE*)* EOF
+	:	((defineClassroom | defineLecturer | defineClass | defineConstraint | definePreference | startSchedule) WHITESPACE*)* EOF
 	;
 
 
@@ -90,10 +90,6 @@ SCHEDULE : S C H E D U L E;
 FIXED : F I X E D;
 NONCONFLICT : N O N DASH C O N F L I C T;
 UNAVAILABLE : U N A V A I L A B L E;
-TEACHING : T E A C H I N G;
-DURATION : D U R A T I O N;
-LIMIT : L I M I T;
 NUMBER: DIGIT+;
 WORD : (LOWERCASE | UPPERCASE)+;
-CLASS_ID : ( UPPERCASE | DIGIT )+;
 ALPHANUMERIC: (LOWERCASE | UPPERCASE | DIGIT)+;
