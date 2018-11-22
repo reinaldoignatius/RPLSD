@@ -3,15 +3,15 @@ package com.rplsd.zadwal.scheduler;
 import java.util.List;
 
 public class Course {
-  private String courseName;
+  private String name;
   private int minimumCapacity;
   private int maximumCapacity;
   private List<String> facilities;
   private int hours;
   private List<String> lecturers;
 
-  public Course(String courseName, int minimumCapacity, int maximumCapacity, List<String> facilities, int hours, List<String> lecturers) {
-    this.courseName = courseName;
+  public Course(String name, int minimumCapacity, int maximumCapacity, List<String> facilities, int hours, List<String> lecturers) {
+    this.name = name;
     this.minimumCapacity = minimumCapacity;
     this.maximumCapacity = maximumCapacity;
     this.facilities = facilities;
@@ -19,12 +19,12 @@ public class Course {
     this.lecturers = lecturers;
   }
 
-  public String getCourseName() {
-    return courseName;
+  public String getName() {
+    return name;
   }
 
-  public void setCourseName(String courseName) {
-    this.courseName = courseName;
+  public void setName(String name) {
+    this.name = name;
   }
 
   public int getMinimumCapacity() {

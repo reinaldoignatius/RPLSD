@@ -27,8 +27,8 @@ public class ZadwalContext {
     }
     private ZadwalContext() {
         this.scheduler = new Scheduler(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
-                new ScheduleRule(new HashMap<>(), new HashMap<>(), new HashSet<>(), Constants.MAX_INT),
-                new ScheduleRule(new HashMap<>(), new HashMap<>(), new HashSet<>(), Constants.MAX_INT));
+                new ScheduleRule(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashSet<>(), Constants.MAX_INT),
+                new ScheduleRule(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashSet<>(), Constants.MAX_INT));
     }
 
     public Scheduler getScheduler() {

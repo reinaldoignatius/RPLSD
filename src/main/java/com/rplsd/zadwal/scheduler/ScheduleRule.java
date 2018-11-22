@@ -9,16 +9,19 @@ import java.util.Set;
 
 public class ScheduleRule {
   private Map<String, Set<String>> nonConflictingClasses;
+  private Map<String, Set<String>> parallelClasses;
   private Map<String, Set<Pair<Integer, Integer>>> fixedClassSchedules;
   private Set<Pair<Integer, Integer>> restrictedTime;
   private int maxLecturerHourInADay;
 
   public ScheduleRule(Map<String, Set<String>> nonConflictingClasses,
+                      Map<String, Set<String>> parallelClasses,
                       Map<String, Set<Pair<Integer, Integer>>> fixedClassSchedules,
                       Set<Pair<Integer, Integer>> restrictedTime,
                       int maxLecturerHourInADay
   ) {
     this.nonConflictingClasses = nonConflictingClasses;
+    this.parallelClasses = parallelClasses;
     this.fixedClassSchedules = fixedClassSchedules;
     this.restrictedTime = restrictedTime;
     this.maxLecturerHourInADay = maxLecturerHourInADay;
@@ -56,6 +59,14 @@ public class ScheduleRule {
     this.maxLecturerHourInADay = maxLecturerHourInADay;
   }
 
+  public Map<String, Set<String>> getParallelClasses() {
+    return parallelClasses;
+  }
+
+  public void setParallelClasses(Map<String, Set<String>> parallelClasses) {
+    this.parallelClasses = parallelClasses;
+  }
+
   public void addNonConflictingClassRule(String className, String otherClassName) {
     try {
       nonConflictingClasses.get(className).add(otherClassName);
@@ -68,6 +79,23 @@ public class ScheduleRule {
       nonConflictingClasses.get(otherClassName).add(className);
     } catch (NullPointerException e) {
       nonConflictingClasses.put(otherClassName, new HashSet<String>(){{
+        add(className);
+      }});
+    }
+  }
+
+  public void addParallelClasses(String className, String otherClassName) {
+    try {
+      parallelClasses.get(className).add(otherClassName);
+    } catch (NullPointerException e) {
+      parallelClasses.put(className, new HashSet<String>(){{
+        add(otherClassName);
+      }});
+    }
+    try {
+      parallelClasses.get(otherClassName).add(className);
+    } catch (NullPointerException e) {
+      parallelClasses.put(otherClassName, new HashSet<String>(){{
         add(className);
       }});
     }
@@ -87,10 +115,14 @@ public class ScheduleRule {
 
   public ScheduleRule add(ScheduleRule scheduleRule) {
     Map<String, Set<String>> nonConflictingClasses = new HashMap<>();
+    Map<String, Set<String>> parallelClasses = new HashMap<>();
     Map<String, Set<Pair<Integer, Integer>>> fixedClassSchedules = new HashMap<>();
     Set<Pair<Integer, Integer>> restrictedTime = new HashSet<>();
     for (Map.Entry<String, Set<String>> entry: scheduleRule.getNonConflictingClasses().entrySet()) {
       nonConflictingClasses.put(entry.getKey(), entry.getValue());
+    }
+    for (Map.Entry<String, Set<String>> entry: scheduleRule.getParallelClasses().entrySet()) {
+      parallelClasses.put(entry.getKey(), entry.getValue());
     }
     for (Map.Entry<String, Set<String>> entry: this.getNonConflictingClasses().entrySet()) {
       nonConflictingClasses.put(entry.getKey(), entry.getValue());
@@ -108,7 +140,7 @@ public class ScheduleRule {
       restrictedTime.add(entry);
     }
     int maxLecturerHourInADay = Integer.min(this.maxLecturerHourInADay, scheduleRule.maxLecturerHourInADay);
-    return new ScheduleRule(nonConflictingClasses, fixedClassSchedules, restrictedTime, maxLecturerHourInADay);
+    return new ScheduleRule(nonConflictingClasses, parallelClasses, fixedClassSchedules, restrictedTime, maxLecturerHourInADay);
   }
 
 }

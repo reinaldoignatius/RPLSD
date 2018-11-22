@@ -18,6 +18,7 @@ public class Scheduler {
   private ArrayList<ArrayList<List<ScheduleItem>>> schedules;
   private HashMap<String, ArrayList<ArrayList<Boolean>>> classroomsAvailability;
   private HashMap<String, ArrayList<ArrayList<Boolean>>> lecturersAvailability;
+  private Set<String> addedCoursesName;
 
   public Scheduler(ArrayList<Classroom> classrooms,
                    ArrayList<Course> courses,
@@ -58,6 +59,7 @@ public class Scheduler {
       }
       lecturersAvailability.put(lecturer.getName(), lecturerAvailability);
     }
+    addedCoursesName = new HashSet<>();
   }
 
   public List<Classroom> getClassrooms() {
@@ -138,7 +140,7 @@ public class Scheduler {
 
   public Course findCourse(String courseName) {
     for (Course course: courses) {
-      if (course.getCourseName().equals(courseName)) return course;
+      if (course.getName().equals(courseName)) return course;
     }
     return null;
   }
@@ -164,6 +166,24 @@ public class Scheduler {
     for (ScheduleItem scheduleItem: schedules.get(day).get(time)) {
       if (rule.getNonConflictingClasses().containsKey(courseName)) {
         if (rule.getNonConflictingClasses().get(courseName).contains(scheduleItem.getCourseName())) return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean checkParallelClasses(ScheduleRule rule, String courseName, int day, int time) {
+    for (String parallelClassName: rule.getParallelClasses().get(courseName)) {
+      if (addedCoursesName.contains(parallelClassName)) {
+        boolean isParallel = false;
+        for (ScheduleItem scheduleItem: schedules.get(day).get(time)) {
+          if (scheduleItem.getCourseName().equals(parallelClassName)) {
+            isParallel = true;
+            break;
+          }
+        }
+        if (!isParallel) {
+          return false;
+        }
       }
     }
     return true;
@@ -196,9 +216,10 @@ public class Scheduler {
   private boolean checkConstraints(ScheduleRule rule, Course course, Classroom classroom, int day, int time) {
     if (!(classroomsAvailability.get(classroom.getId()).get(day).get(time))) return false;
     if (!checkLecturersAvailability(course.getLecturers(), day, time)) return false;
-    if (!checkNonConflictingConstraint(rule, course.getCourseName(), day, time)) return false;
+    if (!checkNonConflictingConstraint(rule, course.getName(), day, time)) return false;
+    if (!checkParallelClasses(rule, course.getName(), day, time)) return false;
     if (rule.getRestrictedTime().contains(new Pair<>(day, time))) return false;
-    if (!checkFixedSchedule(rule, course.getCourseName(), day, time)) return false;
+    if (!checkFixedSchedule(rule, course.getName(), day, time)) return false;
     if (!checkLectureMaxHourInADay(rule, course.getLecturers(), day)) return false;
     return true;
   };
@@ -212,12 +233,13 @@ public class Scheduler {
       for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
         for (int time = 0; time < HOURS_IN_A_DAY; time++) {
           if (checkConstraints(rule, currentCourse, satisfyingClassroom, day, time)) {
-            ScheduleItem scheduleItem = new ScheduleItem(currentCourse.getCourseName(), satisfyingClassroom.getId(), currentCourse.getLecturers());
+            ScheduleItem scheduleItem = new ScheduleItem(currentCourse.getName(), satisfyingClassroom.getId(), currentCourse.getLecturers());
             schedules.get(day).get(time).add(scheduleItem);
             classroomsAvailability.get(satisfyingClassroom.getId()).get(day).set(time, false);
             for (String lectureName : currentCourse.getLecturers()) {
               lecturersAvailability.get(lectureName).get(day).set(time, false);
             }
+            addedCoursesName.add(currentCourse.getName());
             int nextHour = currentHour < currentCourse.getHours() - 1 ? currentHour + 1 : 0;
             int nextClassRequirementIndex = nextHour == 0 ? currentClassRequirementIndex + 1 : currentClassRequirementIndex;
             if (schedule(rule, nextClassRequirementIndex, nextHour)) return true;
@@ -226,6 +248,7 @@ public class Scheduler {
             for (String lectureName : currentCourse.getLecturers()) {
               lecturersAvailability.get(lectureName).get(day).set(time, true);
             }
+            addedCoursesName.remove(currentCourse.getName());
           }
         }
       }
