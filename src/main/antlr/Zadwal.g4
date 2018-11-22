@@ -14,7 +14,6 @@ duration: NUMBER;
 class_a: class_id;
 class_b: class_id;
 
-
 array_of_lecturers: (OPEN_PARENTHESIS (lecturer_name COMMA WHITESPACE*)? lecturer_name CLOSE_PARENTHESIS | lecturer_name);
 array_of_facilities: OPEN_PARENTHESIS (facility COMMA WHITESPACE*)* facility CLOSE_PARENTHESIS;
 array_of_teaching_hours: OPEN_PARENTHESIS (teaching_hour COMMA WHITESPACE*)* teaching_hour CLOSE_PARENTHESIS;
@@ -40,7 +39,7 @@ defineWorkDays
     : SET WORKDAY COUNT TO day_in_week (WITH NAMES array_of_days)? SEMICOLON
     ;
 defineWorkHour
-    : SET WORKHOUR DURATION TO work_hour_duration (WITH EACH CLASS DURATION class_duration)? (START FROM time)? SEMICOLON
+    : SET WORKHOUR DURATION TO work_hour_duration (WITH EACH CLASS DURATION class_duration)? (START AT time)? SEMICOLON
     ;
 
 
@@ -128,7 +127,7 @@ HOUR: (H | H O U R);
 MINUTE: (M | M I N U T E);
 EACH: E A C H;
 START: S T A R T;
-FROM: F R O M;
+AT: A T;
 TIME: DIGIT DIGIT (COLON) DIGIT DIGIT;
 
 NUMBER: DIGIT+;

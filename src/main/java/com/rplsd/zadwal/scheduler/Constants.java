@@ -21,6 +21,7 @@ public class Constants {
   public static int classDuration = 1;
   public static char durationUnit = 'h';
   public static Time startTime = new Time(07,00);
+  public static int terminalWidth = 140;
 
   public static void setDaysInAWeek(int day) {
     daysInAWeek = day;

@@ -70,7 +70,7 @@ public class ZadwalWalker extends ZadwalBaseListener {
     @Override
     public void enterStartSchedule(ZadwalParser.StartScheduleContext ctx) {
         System.out.println("Schedule!");
-//        System.out.println(ZadwalContext.getInstance().getScheduler());
+        System.out.println(ZadwalContext.getInstance().getScheduler());
 
         if (ZadwalContext.getInstance().getScheduler().schedule()) {
             ZadwalContext.getInstance().getScheduler().printSchedule();
@@ -307,5 +307,4 @@ public class ZadwalWalker extends ZadwalBaseListener {
             Constants.setStartTime(new Time(Integer.parseInt(times[0]), 0));
         }
     }
-
 }

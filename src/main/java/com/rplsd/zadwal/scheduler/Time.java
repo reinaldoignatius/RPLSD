@@ -13,7 +13,7 @@ public class Time {
     }
     public void addMinute(int minute) {
         int m = this.minute + minute;
-        if(m > 60) {
+        if(m >= 60) {
             int divisor = m/60;
             m = m % 60;
             this.addHour(divisor);

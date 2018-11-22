@@ -38,6 +38,11 @@ public class ScheduleItem {
   }
 
   public String toString() {
+
+    return String.format("%s : %s - %s", courseName, classRoomId, getFormattedLecturersName());
+  }
+
+  public String getFormattedLecturersName() {
     String lecturersCombinedNames = "";
     boolean first = true;
     for (String lecturerName: lecturerNames) {
@@ -48,6 +53,7 @@ public class ScheduleItem {
       }
       lecturersCombinedNames = lecturersCombinedNames.concat(lecturerName);
     }
-    return String.format("%s : %s - %s", courseName, classRoomId, lecturersCombinedNames);
+    return lecturersCombinedNames;
   }
+
 }

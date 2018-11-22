@@ -1,6 +1,7 @@
 package com.rplsd.zadwal.scheduler;
 
 import com.google.gson.Gson;
+import com.sun.tools.internal.jxc.ap.Const;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -157,6 +158,7 @@ public class Scheduler {
 
   private boolean checkLecturersAvailability(List<String> requiredLecturersNames, int day, int time) {
     for (String requiredLecturerName: requiredLecturersNames) {
+//      System.out.println(requiredLecturerName+ " " + day + " "+ time);
       if (!lecturersAvailability.get(requiredLecturerName).get(day).get(time)) return false;
     }
     return true;
@@ -172,17 +174,19 @@ public class Scheduler {
   }
 
   private boolean checkParallelClasses(ScheduleRule rule, String courseName, int day, int time) {
-    for (String parallelClassName: rule.getParallelClasses().get(courseName)) {
-      if (addedCoursesName.contains(parallelClassName)) {
-        boolean isParallel = false;
-        for (ScheduleItem scheduleItem: schedules.get(day).get(time)) {
-          if (scheduleItem.getCourseName().equals(parallelClassName)) {
-            isParallel = true;
-            break;
+    if (rule.getParallelClasses().containsKey(courseName)) {
+      for (String parallelClassName : rule.getParallelClasses().get(courseName)) {
+        if (addedCoursesName.contains(parallelClassName)) {
+          boolean isParallel = false;
+          for (ScheduleItem scheduleItem : schedules.get(day).get(time)) {
+            if (scheduleItem.getCourseName().equals(parallelClassName)) {
+              isParallel = true;
+              break;
+            }
           }
-        }
-        if (!isParallel) {
-          return false;
+          if (!isParallel) {
+            return false;
+          }
         }
       }
     }
@@ -283,10 +287,12 @@ public class Scheduler {
         System.out.println("]");
       }
     }
+    new Printer().printSchedule(schedules);
   }
 
   @Override
   public String toString() {
-    return new Gson().toJson(this);
+//    return new Gson().toJson(this);
+    return "";
   }
 }
