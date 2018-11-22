@@ -9,12 +9,13 @@ import sun.jvm.hotspot.utilities.ConstantTag;
 import java.util.ArrayList;
 
 public class ZadwalWalker extends ZadwalBaseListener {
+    private static final char PRINT_ALL = 'a';
+    private static final char PRINT_LECTURER = 'l';
+    private static final char PRINT_CLASS = 'c';
     private String roomId;
     private String classId;
     private int capacity;
-    private String facility;
     private String lecturerName;
-    private String teachingHour;
     private int attendeesCount;
     private int duration;
     private int maxCapacity;
@@ -27,6 +28,8 @@ public class ZadwalWalker extends ZadwalBaseListener {
     private String activeRuleType;
     private String classA;
     private String classB;
+    private ArrayList<String> classFilter = new ArrayList<>();
+    private char printType = 'a';
 
     private char durationUnit = 'h';
 
@@ -37,7 +40,7 @@ public class ZadwalWalker extends ZadwalBaseListener {
         Classroom classroom = new Classroom(
                 roomId, capacity, facilities
         );
-
+        facilities = new ArrayList<>();
         ZadwalContext.getInstance().getScheduler().addClassroom(classroom);
     }
 
@@ -61,19 +64,19 @@ public class ZadwalWalker extends ZadwalBaseListener {
                 "Define Class: %s %s %s %s %s %s",
                 classId, attendeesCount, maxCapacity, facilities, duration, lecturers
         ));
+
         Course course = new Course(
                 classId, attendeesCount, maxCapacity, facilities, duration, lecturers
         );
+        facilities = new ArrayList<>();
+        lecturers = new ArrayList<>();
         ZadwalContext.getInstance().getScheduler().addClassRequirement(course);
     }
 
     @Override
     public void enterStartSchedule(ZadwalParser.StartScheduleContext ctx) {
-        System.out.println("Schedule!");
-        System.out.println(ZadwalContext.getInstance().getScheduler());
-
         if (ZadwalContext.getInstance().getScheduler().schedule()) {
-            ZadwalContext.getInstance().getScheduler().printSchedule();
+            System.out.println("Schedule Created");
 
         } else {
             System.out.println("No schedule can satisfy all constraint");
@@ -111,23 +114,24 @@ public class ZadwalWalker extends ZadwalBaseListener {
     }
 
     @Override
-    public void enterLecturer_name(ZadwalParser.Lecturer_nameContext ctx) {
+    public void exitLecturer_name(ZadwalParser.Lecturer_nameContext ctx) {
         lecturerName = ctx.getText();
         lecturers.add(lecturerName);
     }
 
     @Override
-    public void enterClass_id(ZadwalParser.Class_idContext ctx) {
+    public void exitClass_id(ZadwalParser.Class_idContext ctx) {
         classId = ctx.getText();
+        classFilter.add(classId);
     }
 
     @Override
-    public void enterAttendees_count(ZadwalParser.Attendees_countContext ctx) {
+    public void exitAttendees_count(ZadwalParser.Attendees_countContext ctx) {
         attendeesCount = Integer.parseInt(ctx.getText());
     }
 
     @Override
-    public void enterMax_capacity(ZadwalParser.Max_capacityContext ctx) {
+    public void exitMax_capacity(ZadwalParser.Max_capacityContext ctx) {
         maxCapacity = Integer.parseInt(ctx.getText());
     }
 
@@ -189,6 +193,7 @@ public class ZadwalWalker extends ZadwalBaseListener {
                 ZadwalContext.getInstance().getScheduler().getScheduleConstraint().addFixedClassSchedule(
                         classId, ZadwalContext.timeParser(teachingHours)
                 );
+                teachingHours = new ArrayList<>();
                 break;
             case ZadwalContext.NON_CONFLICT:
                 System.out.println("Define Constraint Non-Conflicting classes "+ classes);
@@ -197,6 +202,7 @@ public class ZadwalWalker extends ZadwalBaseListener {
                         i.getKey(), i.getValue()
                     );
                 }
+                classes = new ArrayList<>();
                 break;
             case ZadwalContext.MAX_LECTURER_HOUR:
                 System.out.println("Define Constraint Teaching duration limit per day "+ duration+ "hour");
@@ -212,14 +218,17 @@ public class ZadwalWalker extends ZadwalBaseListener {
                             pairTimeDay.getKey(), pairTimeDay.getValue()
                     );
                 }
+                teachingHours = new ArrayList<>();
                 break;
             case ZadwalContext.PARALLEL:
                 System.out.println("Define Constraint Parallel at "+ classes);
+
                 for(Pair<String,String> i : classes) {
                     ZadwalContext.getInstance().getScheduler().getScheduleConstraint().addParallelClasses(
                             i.getKey(), i.getValue()
                     );
                 }
+                classes = new ArrayList<>();
                 break;
 
 
@@ -234,6 +243,7 @@ public class ZadwalWalker extends ZadwalBaseListener {
                 ZadwalContext.getInstance().getScheduler().getSchedulePreference().addFixedClassSchedule(
                         classId, ZadwalContext.timeParser(teachingHours)
                 );
+                teachingHours = new ArrayList<>();
                 break;
             case ZadwalContext.NON_CONFLICT:
                 System.out.println("Define Preference Non-Conflicting classes "+ classes);
@@ -257,6 +267,7 @@ public class ZadwalWalker extends ZadwalBaseListener {
                             pairTimeDay.getKey(), pairTimeDay.getValue()
                     );
                 }
+                teachingHours = new ArrayList<>();
                 break;
             case ZadwalContext.PARALLEL:
                 System.out.println("Define Preference Parallel at "+ classes);
@@ -265,6 +276,7 @@ public class ZadwalWalker extends ZadwalBaseListener {
                             i.getKey(), i.getValue()
                     );
                 }
+                classes = new ArrayList<>();
                 break;
         }
     }
@@ -283,6 +295,7 @@ public class ZadwalWalker extends ZadwalBaseListener {
     @Override public void exitArray_of_days(ZadwalParser.Array_of_daysContext ctx) {
         System.out.println("Defined day names: "+days);
         Constants.setDayNames(days);
+        days = new ArrayList<>();
     }
 
     @Override public void exitWork_hour_duration(ZadwalParser.Work_hour_durationContext ctx) {
@@ -307,4 +320,36 @@ public class ZadwalWalker extends ZadwalBaseListener {
             Constants.setStartTime(new Time(Integer.parseInt(times[0]), 0));
         }
     }
+
+    @Override public void enterAll(ZadwalParser.AllContext ctx) {
+        printType = PRINT_ALL;
+    }
+    @Override public void enterLecturer(ZadwalParser.LecturerContext cxt) {
+        printType = PRINT_LECTURER;
+    }
+    @Override public void enterSpecific_class(ZadwalParser.Specific_classContext ctx) {
+        printType = PRINT_CLASS;
+    }
+
+    @Override public void enterArray_of_class(ZadwalParser.Array_of_classContext ctx) {
+        classFilter = new ArrayList<>();
+    }
+
+    @Override public void exitPrintSchedule(ZadwalParser.PrintScheduleContext ctx) {
+        switch (printType){
+            case PRINT_ALL:
+                System.out.println("All Schedule");
+                new Printer().printSchedule(ZadwalContext.getInstance().getScheduler().getSchedules());
+                break;
+            case PRINT_CLASS:
+                System.out.println("Schedule for "+classFilter);
+                new Printer().printForClass(ZadwalContext.getInstance().getScheduler().getSchedules(), classFilter);
+                break;
+            case PRINT_LECTURER:
+                System.out.println("Schedule for "+lecturerName);
+                new Printer().printForLecturer(ZadwalContext.getInstance().getScheduler().getSchedules(), lecturerName);
+                break;
+        }
+    }
+
 }

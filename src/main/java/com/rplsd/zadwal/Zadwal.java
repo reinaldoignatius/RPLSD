@@ -38,6 +38,5 @@ public class Zadwal
 
 
         }
-        System.out.println(Constants.toS());
     }
 }

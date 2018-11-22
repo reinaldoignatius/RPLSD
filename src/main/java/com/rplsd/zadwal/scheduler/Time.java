@@ -8,6 +8,10 @@ public class Time {
         this.hour = hour;
         this.minute = minute;
     }
+    public Time(Time time) {
+        this.hour = time.hour;
+        this.minute = time.minute;
+    }
     public void addHour(int hour) {
         this.hour = (this.hour +hour) % 24;
     }

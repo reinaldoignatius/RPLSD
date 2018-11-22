@@ -5,11 +5,16 @@ import com.sun.tools.internal.jxc.ap.Const;
 import java.util.ArrayList;
 import java.util.List;
 public class Printer {
-    int terminalWidth= 140;
-    int columnWidth = 15;
-    int nColumn;
-    boolean printRoom = true;
-    boolean printLecturer = true;
+    private int terminalWidth= 140;
+    private int columnWidth = 15;
+    private int nColumn;
+    private boolean printRoom = true;
+    private boolean printLecturer = true;
+    private boolean filterLecturer = false;
+    private boolean filterClass = false;
+    private String lecturerFilter;
+    private ArrayList<String> classFilter;
+
     public Printer() {
         nColumn = Constants.daysInAWeek +1;
     }
@@ -18,6 +23,16 @@ public class Printer {
         this.printRoom = printRoom;
         this.printLecturer = printLecturer;
     }
+
+    public void setPrintLecturer(boolean printLecturer) {
+        this.printLecturer = printLecturer;
+    }
+
+    public void setPrintRoom(boolean printRoom) {
+        this.printRoom = printRoom;
+    }
+
+
     private void horizontalLine(){
         System.out.print("\u2500");
     }
@@ -106,7 +121,7 @@ public class Printer {
         }
         verticalLine();
         endl();
-        Time currentTime = Constants.startTime;
+        Time currentTime = new Time(Constants.startTime);
         middleBorder(nColumn);
         for(int j=0;j<Constants.hoursInADay;j++) {
             printColumn(currentTime);
@@ -114,8 +129,23 @@ public class Printer {
             int maxScheduleItem = 0;
             for(int i=0;i<Constants.daysInAWeek;i++) {
                 List<ScheduleItem> buf = schedules.get(i).get(j);
-                maxScheduleItem = maxScheduleItem > buf.size() ? maxScheduleItem : buf.size();
-                scheduleList.add(buf);
+                ArrayList<ScheduleItem> filtered = new ArrayList<>();
+                for(ScheduleItem item : buf) {
+                    if(filterClass) {
+                        if(classFilter.indexOf(item.getCourseName()) != -1) {
+                            filtered.add(item);
+                        }
+                    } else if(filterLecturer) {
+                        if(item.getLecturerNames().indexOf(lecturerFilter) != -1) {
+                            filtered.add(item);
+                        }
+                    } else {
+                        filtered.add(item);
+                    }
+                }
+                scheduleList.add(filtered);
+                maxScheduleItem = maxScheduleItem > filtered.size() ? maxScheduleItem : filtered.size();
+
             }
             if(maxScheduleItem == 0) {
                 for(int i=0;i<Constants.daysInAWeek;i++) {
@@ -140,23 +170,28 @@ public class Printer {
                         }
                     }
                     verticalLine();endl();
-                    printColumn("");
-                    for(int k=0;k < nColumn-1;k++) {
-                        List<ScheduleItem> current_schedule = scheduleList.get(k);
-                        if(i < current_schedule.size()) {
-                            printColumn(current_schedule.get(i).getClassRoomId());
-                        } else {
-                            printColumn("");
+                    if(printRoom) {
+                        printColumn("");
+                        for (int k = 0; k < nColumn - 1; k++) {
+                            List<ScheduleItem> current_schedule = scheduleList.get(k);
+                            if (i < current_schedule.size()) {
+                                printColumn(current_schedule.get(i).getClassRoomId());
+                            } else {
+                                printColumn("");
+                            }
                         }
                     }
-                    verticalLine();endl();
-                    printColumn("");
-                    for(int k=0;k < nColumn-1;k++) {
-                        List<ScheduleItem> current_schedule = scheduleList.get(k);
-                        if(i < current_schedule.size()) {
-                            printColumn(current_schedule.get(i).getFormattedLecturersName());
-                        } else {
-                            printColumn("");
+                    if(printLecturer) {
+                        verticalLine();
+                        endl();
+                        printColumn("");
+                        for (int k = 0; k < nColumn - 1; k++) {
+                            List<ScheduleItem> current_schedule = scheduleList.get(k);
+                            if (i < current_schedule.size()) {
+                                printColumn(current_schedule.get(i).getFormattedLecturersName());
+                            } else {
+                                printColumn("");
+                            }
                         }
                     }
                     verticalLine();endl();
@@ -171,5 +206,25 @@ public class Printer {
                 currentTime.addHour(Constants.classDuration);
             }
         }
+   }
+
+   public void printForClass(ArrayList<ArrayList<List<ScheduleItem>>> schedules, ArrayList<String> classFilter) {
+        this.filterClass = true;
+        this.filterLecturer = false;
+        this.classFilter = classFilter;
+        this.printRoom = true;
+        this.printLecturer = true;
+        printSchedule(schedules);
+   }
+   public void printForLecturer(ArrayList<ArrayList<List<ScheduleItem>>> schedules, String lecturerName) {
+        this.filterLecturer = true;
+        this.filterClass = false;
+        this.printRoom = true;
+        this.printLecturer = false;
+        this.lecturerFilter = lecturerName;
+
+        printSchedule(schedules);
+       this.printRoom = true;
+       this.printLecturer = true;
    }
 }

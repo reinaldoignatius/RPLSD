@@ -29,12 +29,18 @@ max_capacity: NUMBER;
 day_in_week: NUMBER;
 day_name: WORD;
 array_of_days: OPEN_PARENTHESIS (day_name COMMA WHITESPACE*)* day_name CLOSE_PARENTHESIS;
+array_of_class: OPEN_PARENTHESIS (class_id COMMA WHITESPACE*)* class_id CLOSE_PARENTHESIS;
 
 minute_unit: MINUTE;
 hour_unit: HOUR;
 time: (NUMBER | TIME);
 class_duration: duration (minute_unit|hour_unit);
 work_hour_duration: NUMBER;
+
+all: ALL;
+lecturer: LECTURER lecturer_name;
+specific_class: CLASS array_of_class;
+
 defineWorkDays
     : SET WORKDAY COUNT TO day_in_week (WITH NAMES array_of_days)? SEMICOLON
     ;
@@ -61,9 +67,14 @@ definePreference
 startSchedule
     : SCHEDULE SEMICOLON
     ;
+printSchedule
+    : PRINT SCHEDULE FOR? (all | lecturer | specific_class) SEMICOLON
+    ;
+
 eval
 	:	((defineClassroom | defineLecturer | defineClass
-	| defineConstraint | definePreference | startSchedule | defineWorkDays |defineWorkHour) WHITESPACE*)* EOF
+	| defineConstraint | definePreference | startSchedule | defineWorkDays
+	| defineWorkHour | printSchedule) WHITESPACE*)* EOF
 	;
 
 
@@ -127,7 +138,10 @@ HOUR: (H | H O U R);
 MINUTE: (M | M I N U T E);
 EACH: E A C H;
 START: S T A R T;
+PRINT: P R I N T;
 AT: A T;
+ALL: A L L;
+FOR: F O R;
 TIME: DIGIT DIGIT (COLON) DIGIT DIGIT;
 
 NUMBER: DIGIT+;
