@@ -38,9 +38,9 @@ public class ZadwalContext {
 
     public static ArrayList< ArrayList<Boolean> > availabilityParser(ArrayList<String> teachingHours) {
         ArrayList<ArrayList<Boolean>> res = new ArrayList<>();
-        for(int i=0;i<Constants.DAYS_IN_A_WEEK;i++) {
-            ArrayList<Boolean> buff = new ArrayList<Boolean>(Constants.HOURS_IN_A_DAY);
-            for(int j=0; j<Constants.HOURS_IN_A_DAY; j++) {
+        for(int i = 0; i<Constants.daysInAWeek; i++) {
+            ArrayList<Boolean> buff = new ArrayList<Boolean>(Constants.hoursInADay);
+            for(int j = 0; j<Constants.hoursInADay; j++) {
                 buff.add(false);
             }
             res.add(buff);

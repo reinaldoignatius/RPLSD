@@ -14,6 +14,7 @@ duration: NUMBER;
 class_a: class_id;
 class_b: class_id;
 
+
 array_of_lecturers: (OPEN_PARENTHESIS (lecturer_name COMMA WHITESPACE*)? lecturer_name CLOSE_PARENTHESIS | lecturer_name);
 array_of_facilities: OPEN_PARENTHESIS (facility COMMA WHITESPACE*)* facility CLOSE_PARENTHESIS;
 array_of_teaching_hours: OPEN_PARENTHESIS (teaching_hour COMMA WHITESPACE*)* teaching_hour CLOSE_PARENTHESIS;
@@ -25,6 +26,23 @@ parallel: PARALLEL OPEN_PARENTHESIS (pair_of_class_id COMMA WHITESPACE*)* pair_o
 unavailable: UNAVAILABLE array_of_teaching_hours;
 teaching_duration_limit: TEACHING DURATION LIMIT duration;
 max_capacity: NUMBER;
+
+day_in_week: NUMBER;
+day_name: WORD;
+array_of_days: OPEN_PARENTHESIS (day_name COMMA WHITESPACE*)* day_name CLOSE_PARENTHESIS;
+
+minute_unit: MINUTE;
+hour_unit: HOUR;
+time: (NUMBER | TIME);
+class_duration: duration (minute_unit|hour_unit);
+work_hour_duration: NUMBER;
+defineWorkDays
+    : SET WORKDAY COUNT TO day_in_week (WITH NAMES array_of_days)? SEMICOLON
+    ;
+defineWorkHour
+    : SET WORKHOUR DURATION TO work_hour_duration (WITH EACH CLASS DURATION class_duration)? (START FROM time)? SEMICOLON
+    ;
+
 
 defineClassroom
     : CLASSROOM WHITESPACE* room_id WHITESPACE* capacity WHITESPACE* array_of_facilities SEMICOLON
@@ -45,7 +63,8 @@ startSchedule
     : SCHEDULE SEMICOLON
     ;
 eval
-	:	((defineClassroom | defineLecturer | defineClass | defineConstraint | definePreference | startSchedule) WHITESPACE*)* EOF
+	:	((defineClassroom | defineLecturer | defineClass
+	| defineConstraint | definePreference | startSchedule | defineWorkDays |defineWorkHour) WHITESPACE*)* EOF
 	;
 
 
@@ -98,6 +117,20 @@ DURATION: D U R A T I O N;
 LIMIT: L I M I T;
 TEACHING: T E A C H I N G;
 PARALLEL: P A R A L L E L;
+SET: S E T;
+WORKDAY: W O R K D A Y;
+WORKHOUR: W O R K H O U R;
+COUNT: C O U N T;
+TO: T O;
+WITH: W I T H;
+NAMES: N A M E S;
+HOUR: (H | H O U R);
+MINUTE: (M | M I N U T E);
+EACH: E A C H;
+START: S T A R T;
+FROM: F R O M;
+TIME: DIGIT DIGIT (COLON) DIGIT DIGIT;
+
 NUMBER: DIGIT+;
 WORD : (LOWERCASE | UPPERCASE)+;
 ALPHANUMERIC: (LOWERCASE | UPPERCASE | DIGIT)+;

@@ -1,5 +1,6 @@
 package com.rplsd.zadwal;
 import com.rplsd.zadwal.parser.ZadwalDriver;
+import com.rplsd.zadwal.scheduler.Constants;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -37,5 +38,6 @@ public class Zadwal
 
 
         }
+        System.out.println(Constants.toS());
     }
 }

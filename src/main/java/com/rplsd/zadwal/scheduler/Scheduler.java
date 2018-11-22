@@ -5,8 +5,8 @@ import javafx.util.Pair;
 
 import java.util.*;
 
-import static com.rplsd.zadwal.scheduler.Constants.DAYS_IN_A_WEEK;
-import static com.rplsd.zadwal.scheduler.Constants.HOURS_IN_A_DAY;
+import static com.rplsd.zadwal.scheduler.Constants.daysInAWeek;
+import static com.rplsd.zadwal.scheduler.Constants.hoursInADay;
 
 public class Scheduler {
   private List<Classroom> classrooms;
@@ -30,19 +30,19 @@ public class Scheduler {
     this.lecturers = lecturers;
     this.scheduleConstraint = scheduleConstraint;
     this.schedulePreference = schedulePreference;
-    schedules = new ArrayList<>(DAYS_IN_A_WEEK);
-    for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
-      schedules.add(new ArrayList<>(HOURS_IN_A_DAY));
-      for (int time = 0; time < HOURS_IN_A_DAY; time++) {
+    schedules = new ArrayList<>(daysInAWeek);
+    for (int day = 0; day < daysInAWeek; day++) {
+      schedules.add(new ArrayList<>(hoursInADay));
+      for (int time = 0; time < hoursInADay; time++) {
         schedules.get(day).add(new ArrayList<>());
       }
     }
     classroomsAvailability = new HashMap<>();
     for (Classroom classroom : classrooms) {
-      ArrayList<ArrayList<Boolean>> classroomAvailability = new ArrayList<>(DAYS_IN_A_WEEK);
-      for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
-        classroomAvailability.add(new ArrayList<>(HOURS_IN_A_DAY));
-        for (int time = 0; time < HOURS_IN_A_DAY; time++) {
+      ArrayList<ArrayList<Boolean>> classroomAvailability = new ArrayList<>(daysInAWeek);
+      for (int day = 0; day < daysInAWeek; day++) {
+        classroomAvailability.add(new ArrayList<>(hoursInADay));
+        for (int time = 0; time < hoursInADay; time++) {
           classroomAvailability.get(day).add(true);
         }
       }
@@ -51,9 +51,9 @@ public class Scheduler {
     lecturersAvailability = new HashMap<>();
     for (Lecturer lecturer: lecturers) {
       ArrayList<ArrayList<Boolean>> lecturerAvailability = new ArrayList<>();
-      for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
-        lecturerAvailability.add(new ArrayList<>(HOURS_IN_A_DAY));
-        for (int time = 0; time < HOURS_IN_A_DAY; time++) {
+      for (int day = 0; day < daysInAWeek; day++) {
+        lecturerAvailability.add(new ArrayList<>(hoursInADay));
+        for (int time = 0; time < hoursInADay; time++) {
           lecturerAvailability.get(day).add(lecturer.getAvailability().get(day).get(time));
         }
       }
@@ -76,10 +76,10 @@ public class Scheduler {
 
   public void addClassroom(Classroom classroom) {
     classrooms.add(classroom);
-    ArrayList<ArrayList<Boolean>> classroomAvailability = new ArrayList<>(DAYS_IN_A_WEEK);
-    for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
-      classroomAvailability.add(new ArrayList<>(HOURS_IN_A_DAY));
-      for (int time = 0; time < HOURS_IN_A_DAY; time++) {
+    ArrayList<ArrayList<Boolean>> classroomAvailability = new ArrayList<>(daysInAWeek);
+    for (int day = 0; day < daysInAWeek; day++) {
+      classroomAvailability.add(new ArrayList<>(hoursInADay));
+      for (int time = 0; time < hoursInADay; time++) {
         classroomAvailability.get(day).add(true);
       }
     }
@@ -109,9 +109,9 @@ public class Scheduler {
   public void addLecturer(Lecturer lecturer) {
     this.lecturers.add(lecturer);
     ArrayList<ArrayList<Boolean>> lecturerAvailability = new ArrayList<>();
-    for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
-      lecturerAvailability.add(new ArrayList<>(HOURS_IN_A_DAY));
-      for (int time = 0; time < HOURS_IN_A_DAY; time++) {
+    for (int day = 0; day < daysInAWeek; day++) {
+      lecturerAvailability.add(new ArrayList<>(hoursInADay));
+      for (int time = 0; time < hoursInADay; time++) {
         lecturerAvailability.get(day).add(new Boolean(lecturer.getAvailability().get(day).get(time)));
       }
     }
@@ -230,8 +230,8 @@ public class Scheduler {
 
     List<Classroom> satisfyingClassrooms = findSatisfyingClassrooms(currentCourse);
     for (Classroom satisfyingClassroom : satisfyingClassrooms) {
-      for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
-        for (int time = 0; time < HOURS_IN_A_DAY; time++) {
+      for (int day = 0; day < daysInAWeek; day++) {
+        for (int time = 0; time < hoursInADay; time++) {
           if (checkConstraints(rule, currentCourse, satisfyingClassroom, day, time)) {
             ScheduleItem scheduleItem = new ScheduleItem(currentCourse.getName(), satisfyingClassroom.getId(), currentCourse.getLecturers());
             schedules.get(day).get(time).add(scheduleItem);
@@ -274,8 +274,8 @@ public class Scheduler {
   }
 
   public void printSchedule() {
-    for (int day = 0; day < DAYS_IN_A_WEEK; day++) {
-      for (int time = 0; time < HOURS_IN_A_DAY; time++) {
+    for (int day = 0; day < daysInAWeek; day++) {
+      for (int time = 0; time < hoursInADay; time++) {
         System.out.println(String.format("Day %s - Time %s: [", day, time));
         for (ScheduleItem scheduleItem: schedules.get(day).get(time)) {
           System.out.println(scheduleItem.toString());
@@ -284,6 +284,7 @@ public class Scheduler {
       }
     }
   }
+
   @Override
   public String toString() {
     return new Gson().toJson(this);

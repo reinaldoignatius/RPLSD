@@ -1,11 +1,10 @@
 package com.rplsd.zadwal.parser;
 
 import com.rplsd.zadwal.Zadwal;
-import com.rplsd.zadwal.scheduler.Classroom;
-import com.rplsd.zadwal.scheduler.Constants;
-import com.rplsd.zadwal.scheduler.Course;
-import com.rplsd.zadwal.scheduler.Lecturer;
+import com.rplsd.zadwal.scheduler.*;
+import com.sun.tools.internal.jxc.ap.Const;
 import javafx.util.Pair;
+import sun.jvm.hotspot.utilities.ConstantTag;
 
 import java.util.ArrayList;
 
@@ -19,13 +18,17 @@ public class ZadwalWalker extends ZadwalBaseListener {
     private int attendeesCount;
     private int duration;
     private int maxCapacity;
+    private int dayInWeek;
     private ArrayList<String> lecturers = new ArrayList<>();
     private ArrayList<String> facilities = new ArrayList<>();
     private ArrayList<String> teachingHours = new ArrayList<>();
     private ArrayList<Pair<String, String>> classes =new ArrayList<>();
+    private ArrayList<String> days = new ArrayList<>();
     private String activeRuleType;
     private String classA;
     private String classB;
+
+    private char durationUnit = 'h';
 
 
     @Override
@@ -265,4 +268,44 @@ public class ZadwalWalker extends ZadwalBaseListener {
                 break;
         }
     }
+    @Override public void exitDay_in_week(ZadwalParser.Day_in_weekContext ctx) {
+        dayInWeek = Integer.parseInt(ctx.getText());
+        Constants.setDaysInAWeek(dayInWeek);
+    }
+
+    @Override public void enterArray_of_days(ZadwalParser.Array_of_daysContext ctx) {
+        days = new ArrayList<>();
+    }
+
+    @Override public void exitDay_name(ZadwalParser.Day_nameContext ctx) {
+        days.add(ctx.getText());
+    }
+    @Override public void exitArray_of_days(ZadwalParser.Array_of_daysContext ctx) {
+        System.out.println("Defined day names: "+days);
+        Constants.setDayNames(days);
+    }
+
+    @Override public void exitWork_hour_duration(ZadwalParser.Work_hour_durationContext ctx) {
+        int workHour = Integer.parseInt(ctx.getText());
+        Constants.setHoursInADay(workHour);
+    }
+
+    @Override public void exitClass_duration(ZadwalParser.Class_durationContext ctx) {
+        Constants.setClassDuration(duration, durationUnit);
+    }
+    @Override public void exitHour_unit(ZadwalParser.Hour_unitContext ctx) {
+        durationUnit = Constants.HOUR_UNIT;
+    }
+    @Override public void exitMinute_unit(ZadwalParser.Minute_unitContext ctx) {
+        durationUnit = Constants.MINUTE_UNIT;
+    }
+    @Override public void exitTime(ZadwalParser.TimeContext ctx) {
+        String[] times = ctx.getText().split(":");
+        if(times.length == 2) {
+            Constants.setStartTime(new Time(Integer.parseInt(times[0]), Integer.parseInt(times[1])));
+        } else {
+            Constants.setStartTime(new Time(Integer.parseInt(times[0]), 0));
+        }
+    }
+
 }
