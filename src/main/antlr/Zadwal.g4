@@ -4,7 +4,7 @@ package com.rplsd.zadwal.parser;
 }
 
 room_id: (NUMBER | WORD | ALPHANUMERIC);
-class_id: ALPHANUMERIC;
+class_id: (NUMBER | WORD | ALPHANUMERIC);
 capacity: NUMBER;
 facility: WORD;
 lecturer_name: WORD;
