@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 public class Printer {
     private int terminalWidth= 140;
-    private int columnWidth = 15;
+    private int columnWidth = 20;
     private int nColumn;
     private boolean printRoom = true;
     private boolean printLecturer = true;
@@ -169,8 +169,8 @@ public class Printer {
                             printColumn("");
                         }
                     }
-                    verticalLine();endl();
                     if(printRoom) {
+                        verticalLine();endl();
                         printColumn("");
                         for (int k = 0; k < nColumn - 1; k++) {
                             List<ScheduleItem> current_schedule = scheduleList.get(k);
@@ -182,8 +182,7 @@ public class Printer {
                         }
                     }
                     if(printLecturer) {
-                        verticalLine();
-                        endl();
+                        verticalLine();endl();
                         printColumn("");
                         for (int k = 0; k < nColumn - 1; k++) {
                             List<ScheduleItem> current_schedule = scheduleList.get(k);
@@ -220,7 +219,7 @@ public class Printer {
         this.filterLecturer = true;
         this.filterClass = false;
         this.printRoom = true;
-        this.printLecturer = false;
+        this.printLecturer = true;
         this.lecturerFilter = lecturerName;
 
         printSchedule(schedules);
