@@ -11,7 +11,7 @@ public class Constants {
   public static final char MINUTE_UNIT = 'm';
   public static final int MAX_INT = 2147483647;
 
-  public static String[] defaultDayNames = {"Monday", "Tuesday" , "Wednesday", "Thursday", "Friday"};
+  public static String[] defaultDayNames = {"Monday", "Tuesday" , "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 
   public static List<String> dayNames = Arrays.asList(defaultDayNames);
 
