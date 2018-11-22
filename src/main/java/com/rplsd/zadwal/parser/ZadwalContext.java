@@ -18,6 +18,7 @@ public class ZadwalContext {
     public static final String MAX_LECTURER_HOUR = "max_lecturer_hour";
     public static final String RESTRICTED_TIME = "restricted_time";
     public static final String NON_CONFLICT = "non_conflict";
+    public static final String PARALLEL = "parallel";
 
     public static ZadwalContext getInstance() {
         if(instance_ == null) {

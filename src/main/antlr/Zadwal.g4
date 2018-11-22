@@ -21,6 +21,7 @@ array_of_teaching_hours: OPEN_PARENTHESIS (teaching_hour COMMA WHITESPACE*)* tea
 fixed_schedule: FIXED SCHEDULE class_id WHITESPACE* array_of_teaching_hours;
 pair_of_class_id: class_a COLON class_b;
 non_conflict: NONCONFLICT OPEN_PARENTHESIS (pair_of_class_id COMMA WHITESPACE*)* pair_of_class_id CLOSE_PARENTHESIS;
+parallel: PARALLEL OPEN_PARENTHESIS (pair_of_class_id COMMA WHITESPACE*)* pair_of_class_id CLOSE_PARENTHESIS;
 unavailable: UNAVAILABLE array_of_teaching_hours;
 teaching_duration_limit: TEACHING DURATION LIMIT duration;
 max_capacity: NUMBER;
@@ -35,10 +36,10 @@ defineClass
     : CLASS WHITESPACE* class_id WHITESPACE* array_of_lecturers WHITESPACE* attendees_count  WHITESPACE* max_capacity? WHITESPACE* array_of_facilities WHITESPACE* duration SEMICOLON
     ;
 defineConstraint
-    : CONSTRAINT (fixed_schedule | non_conflict | unavailable | teaching_duration_limit) SEMICOLON
+    : CONSTRAINT (fixed_schedule | non_conflict | unavailable | teaching_duration_limit | parallel) SEMICOLON
     ;
 definePreference
-    : PREFERENCE (fixed_schedule | non_conflict | unavailable | teaching_duration_limit) SEMICOLON
+    : PREFERENCE (fixed_schedule | non_conflict | unavailable | teaching_duration_limit | parallel) SEMICOLON
     ;
 startSchedule
     : SCHEDULE SEMICOLON
@@ -96,6 +97,7 @@ UNAVAILABLE : U N A V A I L A B L E;
 DURATION: D U R A T I O N;
 LIMIT: L I M I T;
 TEACHING: T E A C H I N G;
+PARALLEL: P A R A L L E L;
 NUMBER: DIGIT+;
 WORD : (LOWERCASE | UPPERCASE)+;
 ALPHANUMERIC: (LOWERCASE | UPPERCASE | DIGIT)+;

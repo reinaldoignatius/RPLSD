@@ -1,5 +1,6 @@
 package com.rplsd.zadwal.parser;
 
+import com.rplsd.zadwal.Zadwal;
 import com.rplsd.zadwal.scheduler.Classroom;
 import com.rplsd.zadwal.scheduler.Constants;
 import com.rplsd.zadwal.scheduler.Course;
@@ -66,9 +67,10 @@ public class ZadwalWalker extends ZadwalBaseListener {
     @Override
     public void enterStartSchedule(ZadwalParser.StartScheduleContext ctx) {
         System.out.println("Schedule!");
+//        System.out.println(ZadwalContext.getInstance().getScheduler());
+
         if (ZadwalContext.getInstance().getScheduler().schedule()) {
             ZadwalContext.getInstance().getScheduler().printSchedule();
-//            System.out.println(ZadwalContext.getInstance().getScheduler());
 
         } else {
             System.out.println("No schedule can satisfy all constraint");
@@ -150,12 +152,12 @@ public class ZadwalWalker extends ZadwalBaseListener {
         activeRuleType = ZadwalContext.MAX_LECTURER_HOUR;
     }
     @Override
-    public void enterClass_a(ZadwalParser.Class_aContext ctx) {
+    public void exitClass_a(ZadwalParser.Class_aContext ctx) {
         classA = classId;
     }
 
     @Override
-    public void enterClass_b(ZadwalParser.Class_bContext ctx) {
+    public void exitClass_b(ZadwalParser.Class_bContext ctx) {
         classB = classId;
     }
 
@@ -167,7 +169,15 @@ public class ZadwalWalker extends ZadwalBaseListener {
     public void enterUnavailable(ZadwalParser.UnavailableContext ctx) {
         activeRuleType = ZadwalContext.RESTRICTED_TIME;
         teachingHours = new ArrayList<>();
+
     }
+
+    @Override
+    public void enterParallel(ZadwalParser.ParallelContext ctx) {
+        activeRuleType = ZadwalContext.PARALLEL;
+        classes = new ArrayList<>();
+    }
+
     @Override
     public void exitDefineConstraint(ZadwalParser.DefineConstraintContext ctx) {
         switch (activeRuleType) {
@@ -199,6 +209,17 @@ public class ZadwalWalker extends ZadwalBaseListener {
                             pairTimeDay.getKey(), pairTimeDay.getValue()
                     );
                 }
+                break;
+            case ZadwalContext.PARALLEL:
+                System.out.println("Define Constraint Parallel at "+ classes);
+                for(Pair<String,String> i : classes) {
+                    ZadwalContext.getInstance().getScheduler().getScheduleConstraint().addParallelClasses(
+                            i.getKey(), i.getValue()
+                    );
+                }
+                break;
+
+
 
         }
     }
@@ -233,7 +254,15 @@ public class ZadwalWalker extends ZadwalBaseListener {
                             pairTimeDay.getKey(), pairTimeDay.getValue()
                     );
                 }
-
+                break;
+            case ZadwalContext.PARALLEL:
+                System.out.println("Define Preference Parallel at "+ classes);
+                for(Pair<String,String> i : classes) {
+                    ZadwalContext.getInstance().getScheduler().getSchedulePreference().addParallelClasses(
+                            i.getKey(), i.getValue()
+                    );
+                }
+                break;
         }
     }
 }
