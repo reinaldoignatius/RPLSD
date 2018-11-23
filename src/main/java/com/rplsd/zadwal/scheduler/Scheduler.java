@@ -31,7 +31,10 @@ public class Scheduler {
     this.lecturers = lecturers;
     this.scheduleConstraint = scheduleConstraint;
     this.schedulePreference = schedulePreference;
-    schedules = new ArrayList<>(daysInAWeek);
+    resetSchedules();
+  }
+  private void resetSchedules(){
+    this.schedules = new ArrayList<>(daysInAWeek);
     for (int day = 0; day < daysInAWeek; day++) {
       schedules.add(new ArrayList<>(hoursInADay));
       for (int time = 0; time < hoursInADay; time++) {
@@ -62,7 +65,6 @@ public class Scheduler {
     }
     addedCoursesName = new HashSet<>();
   }
-
   public List<Classroom> getClassrooms() {
     return classrooms;
   }
@@ -272,6 +274,7 @@ public class Scheduler {
   }
 
   public boolean schedule() {
+    resetSchedules();
     sortClassroomAscendingByCapacity(); //To prioritize class room with smaller capacity in room selection
     if (schedule(scheduleConstraint.add(schedulePreference), 0, 0)) return true;
     return schedule(scheduleConstraint, 0, 0);
